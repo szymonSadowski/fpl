@@ -175,7 +175,6 @@ export type Standing = {
   rank: number;
   teamId: number;
   teamName: string;
-  logo: string;
   played: number;
   win: number;
   draw: number;
@@ -184,6 +183,71 @@ export type Standing = {
   goalsAgainst: number;
   goalDiff: number;
   points: number;
+};
+
+// Enriched types (camelCase from backend)
+export type TeamInfo = {
+  id: number;
+  name: string;
+  shortName: string;
+};
+
+export type PositionInfo = {
+  id: number;
+  name: string;
+};
+
+export type EnrichedPlayer = {
+  id: number;
+  webName: string;
+  firstName: string;
+  secondName: string;
+  team: TeamInfo;
+  position: PositionInfo;
+  cost: number;
+  points: number;
+  eventPoints: number;
   form: string;
-  fplTeamId: number | null;
+  goals: number;
+  assists: number;
+  cleanSheets: number;
+  xG: string;
+  xA: string;
+  selectedByPercent: string;
+  minutes: number;
+  status: 'a' | 'd' | 'i' | 's' | 'u';
+  news: string;
+  bonus: number;
+  bps: number;
+  ictIndex: string;
+};
+
+export type EnrichedPick = {
+  element: number;
+  position: number;
+  multiplier: number;
+  isCaptain: boolean;
+  isViceCaptain: boolean;
+  webName: string;
+  team: TeamInfo;
+  playerPosition: PositionInfo;
+  cost: number;
+};
+
+export type TeamOverview = {
+  entry: {
+    id: number;
+    playerFirstName: string;
+    playerLastName: string;
+    name: string;
+    summaryOverallPoints: number;
+    summaryOverallRank: number;
+    summaryEventPoints: number;
+    currentEvent: number;
+  };
+  currentEvent: number;
+  picks: EnrichedPick[];
+  bank: number;
+  value: number;
+  availableChips: string[];
 };

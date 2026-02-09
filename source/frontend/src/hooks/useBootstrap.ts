@@ -1,5 +1,5 @@
 import { useGet } from './useFetch';
-import type { Team, Player, Event, ElementType, Fixture } from '../types/api';
+import type { Team, Event, ElementType, Fixture, EnrichedPlayer } from '../types/api';
 
 export const useTeams = () =>
   useGet<Array<Team>>({
@@ -23,7 +23,7 @@ export const useEvents = () =>
   });
 
 export const usePlayers = () =>
-  useGet<Array<Player>>({
+  useGet<Array<EnrichedPlayer>>({
     endpoint: '/fpl/players',
     queryKey: ['players'],
     staleTime: 5 * 60 * 1000,

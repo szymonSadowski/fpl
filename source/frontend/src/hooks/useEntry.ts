@@ -1,5 +1,5 @@
 import { useGet } from './useFetch';
-import type { EntryHistoryResponse, Pick } from '../types/api';
+import type { EntryHistoryResponse, Pick, TeamOverview } from '../types/api';
 
 export type Entry = {
   id: number;
@@ -29,24 +29,32 @@ export type EntryPicks = {
 
 export const useEntry = (teamId: number) =>
   useGet<Entry>({
-    endpoint: '/fpl/entry/{id}',
-    pathParams: { id: teamId },
+    endpoint: '/teams/{teamId}/stats',
+    pathParams: { teamId },
     queryKey: ['entry', teamId],
     staleTime: 60 * 1000,
   });
 
 export const useEntryHistory = (teamId: number) =>
   useGet<EntryHistoryResponse>({
-    endpoint: '/fpl/entry/{id}/history',
-    pathParams: { id: teamId },
+    endpoint: '/teams/{teamId}/history',
+    pathParams: { teamId },
     queryKey: ['entryHistory', teamId],
     staleTime: 60 * 1000,
   });
 
 export const useEntryPicks = (teamId: number, event?: number) =>
   useGet<EntryPicks>({
-    endpoint: '/fpl/entry/{id}/picks/{event}',
-    pathParams: { id: teamId, event },
+    endpoint: '/teams/{teamId}/picks/{event}',
+    pathParams: { teamId, event },
     queryKey: ['entryPicks', teamId, event],
+    staleTime: 60 * 1000,
+  });
+
+export const useTeamOverview = (teamId: number) =>
+  useGet<TeamOverview>({
+    endpoint: '/teams/{teamId}',
+    pathParams: { teamId },
+    queryKey: ['teamOverview', teamId],
     staleTime: 60 * 1000,
   });

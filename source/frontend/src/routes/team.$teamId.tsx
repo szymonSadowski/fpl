@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { LogOut, RefreshCw } from 'lucide-react';
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
+import { LogOut, RefreshCw, BarChart3 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { SquadDisplay } from '../components/dashboard/SquadDisplay';
 import { useQueryClient } from '@tanstack/react-query';
@@ -48,6 +48,12 @@ function TeamPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <Link to="/stats">
+              <Button variant="ghost" size="sm">
+                <BarChart3 className="w-4 h-4" />
+                Stats
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" onClick={handleRefresh}>
               <RefreshCw className="w-4 h-4" />
               Refresh
