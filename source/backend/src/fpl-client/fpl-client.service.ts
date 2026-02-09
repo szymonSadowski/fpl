@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import { BootstrapStatic, Team, Player, EnrichedPlayer, Event, ElementType } from '../common/interfaces/fpl-bootstrap.interface';
 import { Fixture, EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
-import { Entry, EntryPicks, EntryHistoryResponse } from '../common/interfaces/fpl-entry.interface';
+import { Entry, EntryPicks, EntryHistoryResponse, TeamOverview, EnrichedPick } from '../common/interfaces/fpl-entry.interface';
 
 const TTL_24H = 86400000;
 const TTL_1H = 3600000;
@@ -259,5 +259,55 @@ export class FplClientService {
 
     // Assign rank
     return standings.map((s, i) => ({ rank: i + 1, ...s }));
+  }
+
+  async getTeamOverview(teamId: number): Promise<TeamOverview> {
+    const [entry, events, history, players, teams, positions] = await Promise.all([
+      this.getEntry(teamId),
+      this.getEvents(),
+      this.getEntryHistory(teamId),
+      this.getPlayersRaw(),
+      this.getTeams(),
+      this.getPositions(),
+    ]);
+
+    const currentEvent = events.find((e) => e.is_current);
+    const currentGw = currentEvent?.id ?? entry.current_event;
+
+    const picks = await this.getEntryPicks(teamId, currentGw);
+
+    const playerMap = new Map(players.map((p) => [p.id, p]));
+    const teamMap = new Map(teams.map((t) => [t.id, t]));
+    const posMap = new Map(positions.map((p) => [p.id, p]));
+
+    const enrichedPicks: EnrichedPick[] = picks.picks.map((pick) => {
+      const player = playerMap.get(pick.element);
+      const team = player ? teamMap.get(player.team) : undefined;
+      const pos = player ? posMap.get(player.element_type) : undefined;
+      return {
+        element: pick.element,
+        position: pick.position,
+        multiplier: pick.multiplier,
+        isCaptain: pick.is_captain,
+        isViceCaptain: pick.is_vice_captain,
+        webName: player?.web_name ?? '',
+        team: { id: team?.id ?? 0, name: team?.name ?? '', shortName: team?.short_name ?? '' },
+        playerPosition: { id: pos?.id ?? 0, name: pos?.singular_name ?? '' },
+        cost: player ? player.now_cost / 10 : 0,
+      };
+    });
+
+    const allChips = ['wildcard', '3xc', 'bboost', 'freehit'];
+    const usedChips = new Set(history.chips.map((c) => c.name));
+    const availableChips = allChips.filter((c) => !usedChips.has(c));
+
+    return {
+      entry,
+      currentEvent: currentGw,
+      picks: enrichedPicks,
+      bank: picks.entry_history.bank / 10,
+      value: picks.entry_history.value / 10,
+      availableChips,
+    };
   }
 }

@@ -5,6 +5,7 @@ import {
   Entry,
   EntryHistoryResponse,
   EntryPicks,
+  TeamOverview,
 } from '../common/interfaces/fpl-entry.interface';
 
 @ApiTags('Teams')
@@ -13,6 +14,15 @@ export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
   @Get(':teamId')
+  @ApiOperation({ summary: 'Get composite team overview (squad, budget, chips)' })
+  @ApiParam({ name: 'teamId', description: 'FPL team ID', example: 2296382 })
+  async getTeamOverview(
+    @Param('teamId', ParseIntPipe) teamId: number,
+  ): Promise<TeamOverview> {
+    return this.teamsService.getTeamOverview(teamId);
+  }
+
+  @Get(':teamId/stats')
   @ApiOperation({ summary: 'Get team/manager info' })
   @ApiParam({ name: 'teamId', description: 'FPL team ID', example: 2296382 })
   async getEntry(

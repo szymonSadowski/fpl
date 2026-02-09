@@ -1,4 +1,6 @@
 import { Pick } from './fpl-my-team.interface';
+import { TeamInfo } from './fpl-fixture.interface';
+import { PositionInfo } from './fpl-bootstrap.interface';
 
 export type Entry = {
   id: number;
@@ -35,4 +37,25 @@ export type EntryPicks = {
   entry_history: EntryHistory;
   picks: Pick[];
   automatic_subs: AutomaticSub[];
+};
+
+export type EnrichedPick = {
+  element: number;
+  position: number;
+  multiplier: number;
+  isCaptain: boolean;
+  isViceCaptain: boolean;
+  webName: string;
+  team: TeamInfo;
+  playerPosition: PositionInfo;
+  cost: number;
+};
+
+export type TeamOverview = {
+  entry: Entry;
+  currentEvent: number;
+  picks: EnrichedPick[];
+  bank: number;
+  value: number;
+  availableChips: string[];
 };

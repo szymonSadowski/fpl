@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FplClientService } from '../fpl-client/fpl-client.service';
-import { Entry, EntryHistoryResponse, EntryPicks } from '../common/interfaces/fpl-entry.interface';
+import { Entry, EntryHistoryResponse, EntryPicks, TeamOverview } from '../common/interfaces/fpl-entry.interface';
 
 @Injectable()
 export class TeamsService {
@@ -8,6 +8,10 @@ export class TeamsService {
 
   async getEntry(teamId: number): Promise<Entry> {
     return this.fplClient.getEntry(teamId);
+  }
+
+  async getTeamOverview(teamId: number): Promise<TeamOverview> {
+    return this.fplClient.getTeamOverview(teamId);
   }
 
   async getEntryHistory(teamId: number): Promise<EntryHistoryResponse> {
