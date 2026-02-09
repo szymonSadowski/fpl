@@ -1,36 +1,39 @@
 import { useMemo } from 'react';
 import { PlayerCard } from './PlayerCard';
 import { usePlayers } from '../../hooks/useBootstrap';
-import type { Pick, Player } from '../../types/api';
+import type { EnrichedPick, EnrichedPlayer } from '../../types/api';
 
 type PitchViewProps = {
-  picks: Array<Pick>;
+  picks: EnrichedPick[];
 };
 
 export function PitchView({ picks }: PitchViewProps) {
   const { data: players } = usePlayers();
 
-  const { starters, bench, playerMap } = useMemo(() => {
-    const playerMap = new Map<number, Player>();
-    players?.forEach((p) => playerMap.set(p.id, p));
+  const playerMap = useMemo(() => {
+    const map = new Map<number, EnrichedPlayer>();
+    players?.forEach((p) => map.set(p.id, p));
+    return map;
+  }, [players]);
 
-    const sortedPicks = [...picks].sort((a, b) => a.position - b.position);
-    const starters = sortedPicks.filter((p) => p.position <= 11);
-    const bench = sortedPicks.filter((p) => p.position > 11);
-
-    return { starters, bench, playerMap };
-  }, [picks, players]);
+  const { starters, benchGk, benchOutfield } = useMemo(() => {
+    const sorted = [...picks].sort((a, b) => a.position - b.position);
+    const bench = sorted.filter((p) => p.position > 11);
+    return {
+      starters: sorted.filter((p) => p.position <= 11),
+      benchGk: bench.filter((p) => p.playerPosition.id === 1),
+      benchOutfield: bench.filter((p) => p.playerPosition.id !== 1),
+    };
+  }, [picks]);
 
   const formation = useMemo(() => {
-    const gk: Array<Pick> = [];
-    const def: Array<Pick> = [];
-    const mid: Array<Pick> = [];
-    const fwd: Array<Pick> = [];
+    const gk: EnrichedPick[] = [];
+    const def: EnrichedPick[] = [];
+    const mid: EnrichedPick[] = [];
+    const fwd: EnrichedPick[] = [];
 
     starters.forEach((pick) => {
-      const player = playerMap.get(pick.element);
-      if (!player) return;
-      switch (player.element_type) {
+      switch (pick.playerPosition.id) {
         case 1: gk.push(pick); break;
         case 2: def.push(pick); break;
         case 3: mid.push(pick); break;
@@ -39,9 +42,7 @@ export function PitchView({ picks }: PitchViewProps) {
     });
 
     return { gk, def, mid, fwd };
-  }, [starters, playerMap]);
-
-  if (!players) return null;
+  }, [starters]);
 
   return (
     <div className="relative w-full aspect-[3/4] max-w-lg mx-auto">
@@ -54,22 +55,15 @@ export function PitchView({ picks }: PitchViewProps) {
             <stop offset="100%" stopColor="#1a472a" />
           </linearGradient>
         </defs>
-        {/* Pitch background */}
         <rect x="0" y="0" width="300" height="400" fill="url(#pitchGradient)" rx="8" />
-        {/* Pitch lines */}
         <g stroke="#3d7a50" strokeWidth="1.5" fill="none">
-          {/* Outer boundary */}
           <rect x="10" y="10" width="280" height="380" rx="4" />
-          {/* Center line */}
           <line x1="10" y1="200" x2="290" y2="200" />
-          {/* Center circle */}
           <circle cx="150" cy="200" r="40" />
           <circle cx="150" cy="200" r="2" fill="#3d7a50" />
-          {/* Top penalty area */}
           <rect x="70" y="10" width="160" height="60" />
           <rect x="100" y="10" width="100" height="30" />
           <circle cx="150" cy="55" r="2" fill="#3d7a50" />
-          {/* Bottom penalty area */}
           <rect x="70" y="330" width="160" height="60" />
           <rect x="100" y="360" width="100" height="30" />
           <circle cx="150" cy="345" r="2" fill="#3d7a50" />
@@ -78,55 +72,52 @@ export function PitchView({ picks }: PitchViewProps) {
 
       {/* Players overlay */}
       <div className="absolute inset-0 flex flex-col justify-between py-4 px-2">
-        {/* Forwards */}
         <FormationRow picks={formation.fwd} playerMap={playerMap} />
-        {/* Midfielders */}
         <FormationRow picks={formation.mid} playerMap={playerMap} />
-        {/* Defenders */}
         <FormationRow picks={formation.def} playerMap={playerMap} />
-        {/* Goalkeeper */}
         <FormationRow picks={formation.gk} playerMap={playerMap} />
       </div>
 
       {/* Bench */}
-      <div className="absolute -bottom-20 left-0 right-0">
-        <div className="text-xs text-text-muted text-center mb-2">BENCH</div>
-        <div className="flex justify-center gap-2">
-          {bench.map((pick) => {
-            const player = playerMap.get(pick.element);
-            if (!player) return null;
-            return (
+      <div className="absolute -bottom-40 left-0 right-0">
+        <div className="glass rounded-xl px-4 pt-5 pb-3 relative">
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 text-[14px] font-display tracking-widest text-text-muted uppercase bg-bg-card">Substitutes</span>
+          <div className="flex items-center justify-center gap-2">
+            {/* Bench GK */}
+            {benchGk.map((pick) => (
               <PlayerCard
                 key={pick.element}
-                player={player}
-                multiplier={pick.multiplier}
-                sellingPrice={pick.selling_price}
+                pick={pick}
+                enrichedPlayer={playerMap.get(pick.element)}
               />
-            );
-          })}
+            ))}
+            {/* Divider */}
+            <div className="w-px h-14 bg-gradient-to-b from-transparent via-fpl-grass/40 to-transparent mx-2" />
+            {/* Bench outfield */}
+            {benchOutfield.map((pick) => (
+              <PlayerCard
+                key={pick.element}
+                pick={pick}
+                enrichedPlayer={playerMap.get(pick.element)}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function FormationRow({ picks, playerMap }: { picks: Array<Pick>; playerMap: Map<number, Player> }) {
+function FormationRow({ picks, playerMap }: { picks: EnrichedPick[]; playerMap: Map<number, EnrichedPlayer> }) {
   return (
     <div className="flex justify-center gap-2">
-      {picks.map((pick) => {
-        const player = playerMap.get(pick.element);
-        if (!player) return null;
-        return (
-          <PlayerCard
-            key={pick.element}
-            player={player}
-            isCaptain={pick.is_captain}
-            isViceCaptain={pick.is_vice_captain}
-            multiplier={pick.multiplier}
-            sellingPrice={pick.selling_price}
-          />
-        );
-      })}
+      {picks.map((pick) => (
+        <PlayerCard
+          key={pick.element}
+          pick={pick}
+          enrichedPlayer={playerMap.get(pick.element)}
+        />
+      ))}
     </div>
   );
 }

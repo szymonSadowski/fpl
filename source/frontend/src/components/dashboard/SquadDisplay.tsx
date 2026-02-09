@@ -1,8 +1,8 @@
 import { formatPrice } from '../../lib/utils';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { PitchView } from './PitchView';
-import { useEntryPicks } from '../../hooks/useEntry';
-import { useEvents, usePlayers } from '../../hooks/useBootstrap';
+import { useTeamOverview } from '../../hooks/useEntry';
+import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
 import { Wallet, TrendingUp } from 'lucide-react';
 
@@ -11,12 +11,10 @@ type SquadDisplayProps = {
 };
 
 export function SquadDisplay({ teamId }: SquadDisplayProps) {
-  const { data: events, isLoading: eventsLoading, isError: eventsError } = useEvents();
+  const { data: overview, isLoading: overviewLoading, isError: overviewError } = useTeamOverview(teamId);
   const { data: players, isLoading: playersLoading } = usePlayers();
-  const currentEvent = events?.find((e) => e.is_current);
-  const { data: entryPicks, isLoading: picksLoading, isError: picksError } = useEntryPicks(teamId, currentEvent?.id);
 
-  if (eventsLoading || playersLoading || picksLoading || !currentEvent) {
+  if (overviewLoading || playersLoading) {
     return (
       <Card className="col-span-2">
         <CardContent className="py-20">
@@ -26,17 +24,7 @@ export function SquadDisplay({ teamId }: SquadDisplayProps) {
     );
   }
 
-  if (eventsError) {
-    return (
-      <Card className="col-span-2">
-        <CardContent className="py-20 text-center text-text-secondary">
-          Failed to load FPL data
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (picksError || !entryPicks) {
+  if (overviewError || !overview) {
     return (
       <Card className="col-span-2">
         <CardContent className="py-20 text-center text-text-secondary">
@@ -46,9 +34,11 @@ export function SquadDisplay({ teamId }: SquadDisplayProps) {
     );
   }
 
-  const totalPoints = entryPicks.picks.reduce((sum, pick) => {
-    const player = players?.find((p) => p.id === pick.element);
-    return sum + (player?.event_points || 0) * pick.multiplier;
+  const playerMap = new Map(players?.map((p) => [p.id, p]) ?? []);
+
+  const totalPoints = overview.picks.reduce((sum, pick) => {
+    const player = playerMap.get(pick.element);
+    return sum + (player?.eventPoints || 0) * pick.multiplier;
   }, 0);
 
   return (
@@ -57,12 +47,13 @@ export function SquadDisplay({ teamId }: SquadDisplayProps) {
         <CardTitle>MY SQUAD</CardTitle>
         <div className="flex items-center gap-4 text-sm">
           <StatPill icon={<TrendingUp className="w-4 h-4" />} label="GW Points" value={totalPoints.toString()} />
-          <StatPill icon={<Wallet className="w-4 h-4" />} label="Value" value={formatPrice(entryPicks.entry_history.value)} />
+          <StatPill icon={<Wallet className="w-4 h-4" />} label="Bank" value={formatPrice(overview.bank)} />
+          <StatPill icon={<Wallet className="w-4 h-4" />} label="Value" value={formatPrice(overview.value)} />
         </div>
       </CardHeader>
       <CardContent>
-        <div className="pb-24">
-          <PitchView picks={entryPicks.picks} />
+        <div className="pb-48">
+          <PitchView picks={overview.picks} />
         </div>
       </CardContent>
     </Card>

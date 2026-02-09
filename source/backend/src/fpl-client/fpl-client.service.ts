@@ -151,7 +151,7 @@ export class FplClientService {
           id: p.element_type,
           name: pos?.singular_name || '',
         },
-        cost: p.now_cost / 10,
+        cost: p.now_cost,
         status: p.status,
         chanceOfPlaying: p.chance_of_playing_next_round,
         form: p.form,
@@ -165,6 +165,10 @@ export class FplClientService {
         minutes: p.minutes,
         selectedByPercent: p.selected_by_percent,
         news: p.news,
+        eventPoints: p.event_points,
+        bonus: p.bonus,
+        bps: p.bps,
+        ictIndex: p.ict_index,
       };
     });
   }
@@ -293,7 +297,7 @@ export class FplClientService {
         webName: player?.web_name ?? '',
         team: { id: team?.id ?? 0, name: team?.name ?? '', shortName: team?.short_name ?? '' },
         playerPosition: { id: pos?.id ?? 0, name: pos?.singular_name ?? '' },
-        cost: player ? player.now_cost / 10 : 0,
+        cost: player ? player.now_cost : 0,
       };
     });
 
@@ -305,8 +309,8 @@ export class FplClientService {
       entry,
       currentEvent: currentGw,
       picks: enrichedPicks,
-      bank: picks.entry_history.bank / 10,
-      value: picks.entry_history.value / 10,
+      bank: picks.entry_history.bank,
+      value: picks.entry_history.value,
       availableChips,
     };
   }

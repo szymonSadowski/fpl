@@ -139,4 +139,8 @@ export type EnrichedPlayer = {
   minutes: number;
   selectedByPercent: string;
   news: string;
+  eventPoints: number;
+  bonus: number;
+  bps: number;
+  ictIndex: string;
 };

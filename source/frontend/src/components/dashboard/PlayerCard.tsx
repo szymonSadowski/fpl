@@ -1,26 +1,16 @@
 import { cn, formatPrice, getPositionName } from '../../lib/utils';
-import type { Player } from '../../types/api';
+import type { EnrichedPick, EnrichedPlayer } from '../../types/api';
 
 type PlayerCardProps = {
-  player: Player;
-  isCaptain?: boolean;
-  isViceCaptain?: boolean;
-  multiplier?: number;
-  sellingPrice?: number;
+  pick: EnrichedPick;
+  enrichedPlayer?: EnrichedPlayer;
   compact?: boolean;
-  teamName?: string;
 };
 
-export function PlayerCard({
-  player,
-  isCaptain,
-  isViceCaptain,
-  multiplier = 1,
-  sellingPrice,
-  compact,
-  teamName,
-}: PlayerCardProps) {
-  const position = getPositionName(player.element_type);
+export function PlayerCard({ pick, enrichedPlayer, compact }: PlayerCardProps) {
+  const position = getPositionName(pick.playerPosition.id);
+  const eventPoints = enrichedPlayer?.eventPoints ?? 0;
+  const status = enrichedPlayer?.status ?? 'a';
 
   if (compact) {
     return (
@@ -30,15 +20,15 @@ export function PlayerCard({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="font-medium truncate">{player.web_name}</span>
-            {isCaptain && <Badge>C</Badge>}
-            {isViceCaptain && <Badge variant="secondary">V</Badge>}
+            <span className="font-medium truncate">{pick.webName}</span>
+            {pick.isCaptain && <Badge>C</Badge>}
+            {pick.isViceCaptain && <Badge variant="secondary">V</Badge>}
           </div>
-          <div className="text-xs text-text-secondary">{teamName}</div>
+          <div className="text-xs text-text-secondary">{pick.team.shortName}</div>
         </div>
         <div className="text-right">
-          <div className="font-medium">{player.event_points * multiplier}</div>
-          <div className="text-xs text-text-muted">{formatPrice(sellingPrice || player.now_cost)}</div>
+          <div className="font-medium">{eventPoints * (pick.multiplier || 1)}</div>
+          <div className="text-xs text-text-muted">{formatPrice(pick.cost)}</div>
         </div>
       </div>
     );
@@ -52,26 +42,26 @@ export function PlayerCard({
           <span className="text-xs font-bold text-fpl-grass">{position}</span>
           {/* Status indicator */}
           <div className={cn('absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-bg-dark', {
-            'bg-success': player.status === 'a',
-            'bg-warning': player.status === 'd',
-            'bg-danger': player.status === 'i' || player.status === 's',
-            'bg-text-muted': player.status === 'u',
+            'bg-success': status === 'a',
+            'bg-warning': status === 'd',
+            'bg-danger': status === 'i' || status === 's',
+            'bg-text-muted': status === 'u',
           })} />
         </div>
 
         {/* Name plate */}
         <div className="w-full bg-bg-card rounded px-1 py-0.5 text-center">
-          <div className="text-[10px] font-medium truncate">{player.web_name}</div>
-          <div className="text-[9px] text-text-muted">{player.event_points * multiplier} pts</div>
+          <div className="text-[10px] font-medium truncate">{pick.webName}</div>
+          <div className="text-[9px] text-text-muted">{eventPoints * (pick.multiplier || 1)} pts</div>
         </div>
 
         {/* Captain badge */}
-        {isCaptain && (
+        {pick.isCaptain && (
           <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-fpl-gold text-bg-dark flex items-center justify-center text-[10px] font-bold">
             C
           </div>
         )}
-        {isViceCaptain && (
+        {pick.isViceCaptain && (
           <div className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-fpl-grass text-bg-dark flex items-center justify-center text-[10px] font-bold">
             V
           </div>
