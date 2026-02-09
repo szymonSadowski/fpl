@@ -1,16 +1,40 @@
 import { cn, formatPrice, getPositionName } from '../../lib/utils';
-import type { EnrichedPick, EnrichedPlayer } from '../../types/api';
+import type { EnrichedPick, EnrichedPlayer, EnrichedFixture } from '../../types/api';
+import { useMemo } from 'react';
+
+type GwMode = 'past' | 'current' | 'future';
 
 type PlayerCardProps = {
   pick: EnrichedPick;
   enrichedPlayer?: EnrichedPlayer;
   compact?: boolean;
+  mode?: GwMode;
+  nextFixtures?: EnrichedFixture[];
 };
 
-export function PlayerCard({ pick, enrichedPlayer, compact }: PlayerCardProps) {
+export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', nextFixtures }: PlayerCardProps) {
   const position = getPositionName(pick.playerPosition.id);
   const eventPoints = enrichedPlayer?.eventPoints ?? 0;
   const status = enrichedPlayer?.status ?? 'a';
+  // Resolve points based on mode
+  const displayPoints = mode === 'past' || mode === 'current'
+    ? (pick.gwPoints !== undefined ? pick.gwPoints : eventPoints) * (pick.multiplier || 1)
+    : 0;
+
+  // Opponent line for past mode
+  const opponentLabel = pick.opponent
+    ? `vs ${pick.opponent.shortName} (${pick.opponent.isHome ? 'H' : 'A'})`
+    : '';
+
+  // Fixture badges for future mode
+  const fixtureBadges = useMemo(() => {
+    if (mode !== 'future' || !nextFixtures) return [];
+    return nextFixtures.map((f) => {
+      const isHome = f.homeTeam.id === pick.team.id;
+      const oppName = isHome ? f.awayTeam.shortName : f.homeTeam.shortName;
+      return { key: f.id, label: `${oppName} (${isHome ? 'H' : 'A'})` };
+    });
+  }, [mode, nextFixtures, pick.team.id]);
 
   if (compact) {
     return (
@@ -27,7 +51,19 @@ export function PlayerCard({ pick, enrichedPlayer, compact }: PlayerCardProps) {
           <div className="text-xs text-text-secondary">{pick.team.shortName}</div>
         </div>
         <div className="text-right">
-          <div className="font-medium">{eventPoints * (pick.multiplier || 1)}</div>
+          {mode !== 'future' && (
+            <>
+              <div className="font-medium">{displayPoints}</div>
+              {opponentLabel && (
+                <div className="text-[10px] text-text-muted">{opponentLabel}</div>
+              )}
+            </>
+          )}
+          {mode === 'future' && (
+            <div className="text-xs text-text-secondary">
+              {fixtureBadges.map((b) => b.label).join(', ')}
+            </div>
+          )}
           <div className="text-xs text-text-muted">{formatPrice(pick.cost)}</div>
         </div>
       </div>
@@ -36,7 +72,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact }: PlayerCardProps) {
 
   return (
     <div className="relative group">
-      <div className="w-16 flex flex-col items-center">
+      <div className="w-20 flex flex-col items-center">
         {/* Jersey */}
         <div className="relative w-12 h-12 rounded-full bg-gradient-to-b from-fpl-pitch to-fpl-pitch/70 flex items-center justify-center mb-1 border-2 border-fpl-grass/30 group-hover:border-fpl-grass transition-colors">
           <span className="text-xs font-bold text-fpl-grass">{position}</span>
@@ -51,8 +87,19 @@ export function PlayerCard({ pick, enrichedPlayer, compact }: PlayerCardProps) {
 
         {/* Name plate */}
         <div className="w-full bg-bg-card rounded px-1 py-0.5 text-center">
-          <div className="text-[10px] font-medium truncate">{pick.webName}</div>
-          <div className="text-[9px] text-text-muted">{eventPoints * (pick.multiplier || 1)} pts</div>
+          <div className="text-xs font-medium truncate">{pick.webName}</div>
+          {mode !== 'future' ? (
+            <>
+              <div className="text-[11px] text-text-muted">{displayPoints} pts</div>
+              {opponentLabel && (
+                <div className="text-[10px] text-text-secondary">{opponentLabel}</div>
+              )}
+            </>
+          ) : (
+            <div className="text-[11px] text-text-secondary mt-0.5 leading-tight">
+              {fixtureBadges.map((b) => b.label).join(', ')}
+            </div>
+          )}
         </div>
 
         {/* Captain badge */}

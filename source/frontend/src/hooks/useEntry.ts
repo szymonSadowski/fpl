@@ -51,10 +51,11 @@ export const useEntryPicks = (teamId: number, event?: number) =>
     staleTime: 60 * 1000,
   });
 
-export const useTeamOverview = (teamId: number) =>
+export const useTeamOverview = (teamId: number, event?: number) =>
   useGet<TeamOverview>({
     endpoint: '/teams/{teamId}',
     pathParams: { teamId },
-    queryKey: ['teamOverview', teamId],
+    queryParams: event !== undefined ? { event } : undefined,
+    queryKey: ['teamOverview', teamId, event],
     staleTime: 60 * 1000,
   });

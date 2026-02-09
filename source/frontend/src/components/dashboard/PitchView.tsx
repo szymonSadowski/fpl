@@ -1,20 +1,44 @@
 import { useMemo } from 'react';
 import { PlayerCard } from './PlayerCard';
-import { usePlayers } from '../../hooks/useBootstrap';
-import type { EnrichedPick, EnrichedPlayer } from '../../types/api';
+import { usePlayers, useFixtures } from '../../hooks/useBootstrap';
+import type { EnrichedPick, EnrichedPlayer, EnrichedFixture } from '../../types/api';
+
+type GwMode = 'past' | 'current' | 'future';
 
 type PitchViewProps = {
   picks: EnrichedPick[];
+  mode: GwMode;
+  gw: number;
 };
 
-export function PitchView({ picks }: PitchViewProps) {
+export function PitchView({ picks, mode, gw }: PitchViewProps) {
   const { data: players } = usePlayers();
+  const { data: allFixtures } = useFixtures();
 
   const playerMap = useMemo(() => {
     const map = new Map<number, EnrichedPlayer>();
     players?.forEach((p) => map.set(p.id, p));
     return map;
   }, [players]);
+
+  // Build next-3-fixtures lookup per team for future mode
+  const teamNextFixtures = useMemo(() => {
+    if (mode !== 'future' || !allFixtures) return new Map<number, EnrichedFixture[]>();
+    const map = new Map<number, EnrichedFixture[]>();
+    const futureFixtures = allFixtures
+      .filter((f) => f.event !== null && f.event >= gw)
+      .sort((a, b) => (a.event ?? 0) - (b.event ?? 0));
+    futureFixtures.forEach((f) => {
+      for (const teamId of [f.homeTeam.id, f.awayTeam.id]) {
+        const existing = map.get(teamId) ?? [];
+        if (existing.length < 3) {
+          existing.push(f);
+          map.set(teamId, existing);
+        }
+      }
+    });
+    return map;
+  }, [mode, gw, allFixtures]);
 
   const { starters, benchGk, benchOutfield } = useMemo(() => {
     const sorted = [...picks].sort((a, b) => a.position - b.position);
@@ -72,10 +96,10 @@ export function PitchView({ picks }: PitchViewProps) {
 
       {/* Players overlay */}
       <div className="absolute inset-0 flex flex-col justify-between py-4 px-2">
-        <FormationRow picks={formation.fwd} playerMap={playerMap} />
-        <FormationRow picks={formation.mid} playerMap={playerMap} />
-        <FormationRow picks={formation.def} playerMap={playerMap} />
-        <FormationRow picks={formation.gk} playerMap={playerMap} />
+        <FormationRow picks={formation.fwd} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
+        <FormationRow picks={formation.mid} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
+        <FormationRow picks={formation.def} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
+        <FormationRow picks={formation.gk} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
       </div>
 
       {/* Bench */}
@@ -83,22 +107,23 @@ export function PitchView({ picks }: PitchViewProps) {
         <div className="glass rounded-xl px-4 pt-5 pb-3 relative">
           <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 text-[14px] font-display tracking-widest text-text-muted uppercase bg-bg-card">Substitutes</span>
           <div className="flex items-center justify-center gap-2">
-            {/* Bench GK */}
             {benchGk.map((pick) => (
               <PlayerCard
                 key={pick.element}
                 pick={pick}
                 enrichedPlayer={playerMap.get(pick.element)}
+                mode={mode}
+                nextFixtures={teamNextFixtures.get(pick.team.id)}
               />
             ))}
-            {/* Divider */}
             <div className="w-px h-14 bg-gradient-to-b from-transparent via-fpl-grass/40 to-transparent mx-2" />
-            {/* Bench outfield */}
             {benchOutfield.map((pick) => (
               <PlayerCard
                 key={pick.element}
                 pick={pick}
                 enrichedPlayer={playerMap.get(pick.element)}
+                mode={mode}
+                nextFixtures={teamNextFixtures.get(pick.team.id)}
               />
             ))}
           </div>
@@ -108,7 +133,17 @@ export function PitchView({ picks }: PitchViewProps) {
   );
 }
 
-function FormationRow({ picks, playerMap }: { picks: EnrichedPick[]; playerMap: Map<number, EnrichedPlayer> }) {
+function FormationRow({
+  picks,
+  playerMap,
+  mode,
+  teamNextFixtures,
+}: {
+  picks: EnrichedPick[];
+  playerMap: Map<number, EnrichedPlayer>;
+  mode: GwMode;
+  teamNextFixtures: Map<number, EnrichedFixture[]>;
+}) {
   return (
     <div className="flex justify-center gap-2">
       {picks.map((pick) => (
@@ -116,6 +151,8 @@ function FormationRow({ picks, playerMap }: { picks: EnrichedPick[]; playerMap: 
           key={pick.element}
           pick={pick}
           enrichedPlayer={playerMap.get(pick.element)}
+          mode={mode}
+          nextFixtures={teamNextFixtures.get(pick.team.id)}
         />
       ))}
     </div>

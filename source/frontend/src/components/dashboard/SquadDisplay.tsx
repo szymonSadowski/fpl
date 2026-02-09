@@ -1,18 +1,26 @@
 import { formatPrice } from '../../lib/utils';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { PitchView } from './PitchView';
+import { GwNavigator } from './GwNavigator';
 import { useTeamOverview } from '../../hooks/useEntry';
 import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
 import { Wallet, TrendingUp } from 'lucide-react';
 
+type GwMode = 'past' | 'current' | 'future';
+
 type SquadDisplayProps = {
   teamId: number;
+  gw: number;
+  currentGw: number;
+  onGwChange: (gw: number) => void;
 };
 
-export function SquadDisplay({ teamId }: SquadDisplayProps) {
-  const { data: overview, isLoading: overviewLoading, isError: overviewError } = useTeamOverview(teamId);
+export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplayProps) {
+  const { data: overview, isLoading: overviewLoading, isError: overviewError } = useTeamOverview(teamId, gw);
   const { data: players, isLoading: playersLoading } = usePlayers();
+
+  const mode: GwMode = gw < currentGw ? 'past' : gw > currentGw ? 'future' : 'current';
 
   if (overviewLoading || playersLoading) {
     return (
@@ -37,23 +45,33 @@ export function SquadDisplay({ teamId }: SquadDisplayProps) {
   const playerMap = new Map(players?.map((p) => [p.id, p]) ?? []);
 
   const totalPoints = overview.picks.reduce((sum, pick) => {
+    if (pick.gwPoints !== undefined) {
+      return sum + pick.gwPoints * pick.multiplier;
+    }
     const player = playerMap.get(pick.element);
     return sum + (player?.eventPoints || 0) * pick.multiplier;
   }, 0);
 
   return (
     <Card className="lg:col-span-2">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>MY SQUAD</CardTitle>
-        <div className="flex items-center gap-4 text-sm">
-          <StatPill icon={<TrendingUp className="w-4 h-4" />} label="GW Points" value={totalPoints.toString()} />
-          <StatPill icon={<Wallet className="w-4 h-4" />} label="Bank" value={formatPrice(overview.bank)} />
-          <StatPill icon={<Wallet className="w-4 h-4" />} label="Value" value={formatPrice(overview.value)} />
+      <CardHeader className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <CardTitle>MY SQUAD</CardTitle>
+            <div className="flex items-center gap-3 text-sm">
+              {mode !== 'future' && (
+                <StatPill icon={<TrendingUp className="w-4 h-4" />} label="GW Pts" value={totalPoints.toString()} />
+              )}
+              <StatPill icon={<Wallet className="w-4 h-4" />} label="Bank" value={formatPrice(overview.bank)} />
+              <StatPill icon={<Wallet className="w-4 h-4" />} label="Value" value={formatPrice(overview.value)} />
+            </div>
+          </div>
+          <GwNavigator gw={gw} currentGw={currentGw} onGwChange={onGwChange} />
         </div>
       </CardHeader>
       <CardContent>
         <div className="pb-48">
-          <PitchView picks={overview.picks} />
+          <PitchView picks={overview.picks} mode={mode} gw={gw} />
         </div>
       </CardContent>
     </Card>

@@ -10,8 +10,8 @@ export class TeamsService {
     return this.fplClient.getEntry(teamId);
   }
 
-  async getTeamOverview(teamId: number): Promise<TeamOverview> {
-    return this.fplClient.getTeamOverview(teamId);
+  async getTeamOverview(teamId: number, event?: number): Promise<TeamOverview> {
+    return this.fplClient.getTeamOverview(teamId, event);
   }
 
   async getEntryHistory(teamId: number): Promise<EntryHistoryResponse> {

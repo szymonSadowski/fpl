@@ -1,13 +1,15 @@
 import {
   Controller,
   Get,
+  Param,
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { FplClientService } from './fpl-client.service';
 import { Team, EnrichedPlayer, Event, ElementType } from '../common/interfaces/fpl-bootstrap.interface';
 import { EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
+import { LiveResponse } from '../common/interfaces/fpl-live.interface';
 
 @ApiTags('FPL')
 @Controller('fpl')
@@ -45,5 +47,14 @@ export class FplClientController {
     @Query('event', new ParseIntPipe({ optional: true })) event?: number,
   ): Promise<EnrichedFixture[]> {
     return this.fplClientService.getFixtures(event);
+  }
+
+  @Get('live/:event')
+  @ApiOperation({ summary: 'Get live GW data (player points per event)' })
+  @ApiParam({ name: 'event', description: 'Gameweek number', example: 20 })
+  async getEventLive(
+    @Param('event', ParseIntPipe) event: number,
+  ): Promise<LiveResponse> {
+    return this.fplClientService.getEventLive(event);
   }
 }

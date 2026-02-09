@@ -7,6 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { BootstrapStatic, Team, Player, EnrichedPlayer, Event, ElementType } from '../common/interfaces/fpl-bootstrap.interface';
 import { Fixture, EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
 import { Entry, EntryPicks, EntryHistoryResponse, TeamOverview, EnrichedPick } from '../common/interfaces/fpl-entry.interface';
+import { LiveResponse } from '../common/interfaces/fpl-live.interface';
 
 const TTL_24H = 86400000;
 const TTL_1H = 3600000;
@@ -198,6 +199,23 @@ export class FplClientService {
     return data;
   }
 
+  async getEventLive(event: number): Promise<LiveResponse> {
+    const cacheKey = `live-${event}`;
+    const cached = await this.cacheManager.get<LiveResponse>(cacheKey);
+    if (cached) return cached;
+
+    const { data } = await firstValueFrom(
+      this.httpService.get<LiveResponse>(`${this.baseUrl}/event/${event}/live/`),
+    );
+
+    // Finished events cache 24h, current/future 5min
+    const events = await this.getEvents();
+    const ev = events.find((e) => e.id === event);
+    const ttl = ev?.finished ? TTL_24H : TTL_5MIN;
+    await this.cacheManager.set(cacheKey, data, ttl);
+    return data;
+  }
+
   async getStandings(): Promise<{
     rank: number;
     teamId: number;
@@ -265,7 +283,7 @@ export class FplClientService {
     return standings.map((s, i) => ({ rank: i + 1, ...s }));
   }
 
-  async getTeamOverview(teamId: number): Promise<TeamOverview> {
+  async getTeamOverview(teamId: number, event?: number): Promise<TeamOverview> {
     const [entry, events, history, players, teams, positions] = await Promise.all([
       this.getEntry(teamId),
       this.getEvents(),
@@ -277,17 +295,50 @@ export class FplClientService {
 
     const currentEvent = events.find((e) => e.is_current);
     const currentGw = currentEvent?.id ?? entry.current_event;
+    const selectedGw = event ?? currentGw;
+    const selectedEvent = events.find((e) => e.id === selectedGw);
+    const isPast = selectedEvent ? selectedEvent.finished : selectedGw < currentGw;
 
-    const picks = await this.getEntryPicks(teamId, currentGw);
+    // For future GWs, picks may not exist yet — fall back to current GW picks
+    let picks: EntryPicks;
+    try {
+      picks = await this.getEntryPicks(teamId, selectedGw);
+    } catch {
+      picks = await this.getEntryPicks(teamId, currentGw);
+    }
+
+    const gwFixtures = await this.getFixturesRaw(selectedGw);
 
     const playerMap = new Map(players.map((p) => [p.id, p]));
     const teamMap = new Map(teams.map((t) => [t.id, t]));
     const posMap = new Map(positions.map((p) => [p.id, p]));
 
+    // Fetch live data for past/current GWs (where the event has started)
+    let liveMap: Map<number, number> | undefined;
+    if (selectedEvent && (selectedEvent.finished || selectedEvent.is_current)) {
+      const liveData = await this.getEventLive(selectedGw);
+      liveMap = new Map(liveData.elements.map((el) => [el.id, el.stats.total_points]));
+    }
+
     const enrichedPicks: EnrichedPick[] = picks.picks.map((pick) => {
       const player = playerMap.get(pick.element);
       const team = player ? teamMap.get(player.team) : undefined;
       const pos = player ? posMap.get(player.element_type) : undefined;
+      const playerTeamId = player?.team;
+
+      // Find opponent for this GW
+      let opponent: { shortName: string; isHome: boolean } | undefined;
+      if (playerTeamId) {
+        const fix = gwFixtures.find(
+          (f) => f.team_h === playerTeamId || f.team_a === playerTeamId,
+        );
+        if (fix) {
+          const isHome = fix.team_h === playerTeamId;
+          const oppTeam = teamMap.get(isHome ? fix.team_a : fix.team_h);
+          opponent = { shortName: oppTeam?.short_name ?? '', isHome };
+        }
+      }
+
       return {
         element: pick.element,
         position: pick.position,
@@ -298,6 +349,8 @@ export class FplClientService {
         team: { id: team?.id ?? 0, name: team?.name ?? '', shortName: team?.short_name ?? '' },
         playerPosition: { id: pos?.id ?? 0, name: pos?.singular_name ?? '' },
         cost: player ? player.now_cost : 0,
+        gwPoints: liveMap?.get(pick.element),
+        opponent,
       };
     });
 
@@ -308,6 +361,7 @@ export class FplClientService {
     return {
       entry,
       currentEvent: currentGw,
+      selectedEvent: selectedGw,
       picks: enrichedPicks,
       bank: picks.entry_history.bank,
       value: picks.entry_history.value,

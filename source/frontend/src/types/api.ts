@@ -170,6 +170,20 @@ export type Fixture = {
   team_a_difficulty: number;
 };
 
+export type EnrichedFixture = {
+  id: number;
+  event: number | null;
+  kickoffTime: string | null;
+  homeTeam: TeamInfo;
+  awayTeam: TeamInfo;
+  homeScore: number | null;
+  awayScore: number | null;
+  homeDifficulty: number;
+  awayDifficulty: number;
+  finished: boolean;
+  started: boolean;
+};
+
 // Standings types (from API-Football)
 export type Standing = {
   rank: number;
@@ -232,6 +246,8 @@ export type EnrichedPick = {
   team: TeamInfo;
   playerPosition: PositionInfo;
   cost: number;
+  gwPoints?: number;
+  opponent?: { shortName: string; isHome: boolean };
 };
 
 export type TeamOverview = {
@@ -246,6 +262,7 @@ export type TeamOverview = {
     currentEvent: number;
   };
   currentEvent: number;
+  selectedEvent: number;
   picks: EnrichedPick[];
   bank: number;
   value: number;

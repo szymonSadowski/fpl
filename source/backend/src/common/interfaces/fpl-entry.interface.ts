@@ -49,11 +49,14 @@ export type EnrichedPick = {
   team: TeamInfo;
   playerPosition: PositionInfo;
   cost: number;
+  gwPoints?: number;
+  opponent?: { shortName: string; isHome: boolean };
 };
 
 export type TeamOverview = {
   entry: Entry;
   currentEvent: number;
+  selectedEvent: number;
   picks: EnrichedPick[];
   bank: number;
   value: number;

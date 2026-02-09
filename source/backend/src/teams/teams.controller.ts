@@ -1,5 +1,5 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { TeamsService } from './teams.service';
 import {
   Entry,
@@ -16,10 +16,12 @@ export class TeamsController {
   @Get(':teamId')
   @ApiOperation({ summary: 'Get composite team overview (squad, budget, chips)' })
   @ApiParam({ name: 'teamId', description: 'FPL team ID', example: 2296382 })
+  @ApiQuery({ name: 'event', required: false, description: 'Gameweek number' })
   async getTeamOverview(
     @Param('teamId', ParseIntPipe) teamId: number,
+    @Query('event', new ParseIntPipe({ optional: true })) event?: number,
   ): Promise<TeamOverview> {
-    return this.teamsService.getTeamOverview(teamId);
+    return this.teamsService.getTeamOverview(teamId, event);
   }
 
   @Get(':teamId/stats')
