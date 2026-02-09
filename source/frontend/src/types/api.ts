@@ -148,6 +148,9 @@ export type LineupRecommendation = {
   captain: number;
   viceCaptain: number;
   reasons: Record<number, string>;
+  mode: 'prediction' | 'hindsight';
+  optimalPoints?: number;
+  actualPoints?: number;
 };
 
 export type ChipRecommendation = {

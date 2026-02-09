@@ -9,11 +9,12 @@ export const useTransferRecs = (teamId: number) =>
     staleTime: 5 * 60 * 1000,
   });
 
-export const useLineupRecs = (teamId: number) =>
+export const useLineupRecs = (teamId: number, event?: number) =>
   useGet<LineupRecommendation>({
     endpoint: '/recommendations/lineup/{id}',
     pathParams: { id: teamId },
-    queryKey: ['lineupRecs', teamId],
+    queryParams: event !== undefined ? { event } : undefined,
+    queryKey: ['lineupRecs', teamId, event],
     staleTime: 5 * 60 * 1000,
   });
 

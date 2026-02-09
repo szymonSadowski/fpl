@@ -11,6 +11,7 @@ import {
   EntryPicks,
   EntryHistoryResponse,
 } from '../common/interfaces/fpl-entry.interface';
+import { LiveResponse } from '../common/interfaces/fpl-live.interface';
 
 type ScoredPick = Pick & { player: Player; score: number };
 
@@ -27,6 +28,9 @@ export type LineupSuggestion = {
   captain: number;
   viceCaptain: number;
   reasons: Record<number, string>;
+  mode: 'prediction' | 'hindsight';
+  optimalPoints?: number;
+  actualPoints?: number;
 };
 
 export type ChipSuggestion = {
@@ -105,19 +109,48 @@ export class RecommendationService {
     return suggestions.sort((a, b) => b.score - a.score).slice(0, 5);
   }
 
-  async getOptimalLineup(teamId: number): Promise<LineupSuggestion> {
-    const players: Player[] = await this.fplClient.getPlayersRaw();
-    const events: FplEvent[] = await this.fplClient.getEvents();
-    const entry: Entry = await this.fplClient.getEntry(teamId);
-    const fixtures: Fixture[] = await this.fplClient.getFixturesRaw();
+  async getOptimalLineup(
+    teamId: number,
+    event?: number,
+  ): Promise<LineupSuggestion> {
+    const [players, events, entry, fixtures] = await Promise.all([
+      this.fplClient.getPlayersRaw(),
+      this.fplClient.getEvents(),
+      this.fplClient.getEntry(teamId),
+      this.fplClient.getFixturesRaw(),
+    ]);
 
     const currentEvent: number =
       entry.current_event || events.find((e) => e.is_current)?.id || 1;
-    const picks: EntryPicks = await this.fplClient.getEntryPicks(
-      teamId,
-      currentEvent,
+    const targetEvent = event ?? currentEvent;
+
+    const eventObj = events.find((e) => e.id === targetEvent);
+    const isHindsight = eventObj?.finished ?? false;
+
+    let picks: EntryPicks;
+    try {
+      picks = await this.fplClient.getEntryPicks(teamId, targetEvent);
+    } catch {
+      picks = await this.fplClient.getEntryPicks(teamId, currentEvent);
+    }
+
+    if (isHindsight) {
+      return this.buildHindsightLineup(players, picks, targetEvent);
+    }
+
+    const gw: Fixture[] = fixtures.filter((f) => f.event === targetEvent);
+    return this.buildPredictionLineup(players, picks, gw);
+  }
+
+  private async buildHindsightLineup(
+    players: Player[],
+    picks: EntryPicks,
+    event: number,
+  ): Promise<LineupSuggestion> {
+    const liveData: LiveResponse = await this.fplClient.getEventLive(event);
+    const pointsMap = new Map(
+      liveData.elements.map((el) => [el.id, el.stats.total_points]),
     );
-    const gw: Fixture[] = fixtures.filter((f) => f.event === currentEvent);
 
     const scored: ScoredPick[] = [];
     for (const pick of picks.picks) {
@@ -126,11 +159,86 @@ export class RecommendationService {
         scored.push({
           ...pick,
           player,
-          score: this.scorePlayer(player, gw),
+          score: pointsMap.get(pick.element) ?? 0,
         });
       }
     }
 
+    const { starting, bench, captain, viceCaptain } =
+      this.pickOptimalFormation(scored);
+
+    const reasons: Record<number, string> = {};
+    for (const s of scored) {
+      const pts = pointsMap.get(s.element) ?? 0;
+      reasons[s.element] = `${pts} pts`;
+    }
+
+    // Compute optimal points (captain gets 2x)
+    const optimalPoints = starting.reduce((sum, id) => {
+      const pts = pointsMap.get(id) ?? 0;
+      return sum + (id === captain ? pts * 2 : pts);
+    }, 0);
+
+    // Compute actual points from original picks
+    const actualPoints = picks.picks.reduce((sum, pick) => {
+      const pts = pointsMap.get(pick.element) ?? 0;
+      return sum + pts * pick.multiplier;
+    }, 0);
+
+    return {
+      starting: starting.filter(Boolean),
+      bench: bench.filter(Boolean),
+      captain,
+      viceCaptain,
+      reasons,
+      mode: 'hindsight',
+      optimalPoints,
+      actualPoints,
+    };
+  }
+
+  private buildPredictionLineup(
+    players: Player[],
+    picks: EntryPicks,
+    gwFixtures: Fixture[],
+  ): LineupSuggestion {
+    const scored: ScoredPick[] = [];
+    for (const pick of picks.picks) {
+      const player = players.find((p) => p.id === pick.element);
+      if (player) {
+        scored.push({
+          ...pick,
+          player,
+          score: this.scorePlayer(player, gwFixtures),
+        });
+      }
+    }
+
+    const { starting, bench, captain, viceCaptain } =
+      this.pickOptimalFormation(scored);
+
+    const reasons: Record<number, string> = {};
+    for (const s of scored) {
+      reasons[s.element] =
+        `Form: ${s.player.form}, xG: ${s.player.expected_goals}`;
+    }
+
+    return {
+      starting: starting.filter(Boolean),
+      bench: bench.filter(Boolean),
+      captain,
+      viceCaptain,
+      reasons,
+      mode: 'prediction',
+    };
+  }
+
+  private pickOptimalFormation(scored: ScoredPick[]): {
+    starting: number[];
+    bench: number[];
+    captain: number;
+    viceCaptain: number;
+  } {
     scored.sort((a, b) => b.score - a.score);
 
     const byPos: Record<number, ScoredPick[]> = { 1: [], 2: [], 3: [], 4: [] };
@@ -140,10 +248,9 @@ export class RecommendationService {
 
     const starting: number[] = [];
     const bench: number[] = [];
-    const reasons: Record<number, string> = {};
 
     starting.push(byPos[1][0].element);
-    bench.push(byPos[1][1]?.element);
+    if (byPos[1][1]) bench.push(byPos[1][1].element);
 
     const remaining = [...byPos[2], ...byPos[3], ...byPos[4]].sort(
       (a, b) => b.score - a.score,
@@ -180,18 +287,7 @@ export class RecommendationService {
     const captain = startingScored[0]?.element || starting[0];
     const viceCaptain = startingScored[1]?.element || starting[1];
 
-    for (const s of scored) {
-      reasons[s.element] =
-        `Form: ${s.player.form}, xG: ${s.player.expected_goals}`;
-    }
-
-    return {
-      starting: starting.filter(Boolean),
-      bench: bench.filter(Boolean),
-      captain,
-      viceCaptain,
-      reasons,
-    };
+    return { starting, bench, captain, viceCaptain };
   }
 
   async getChipSuggestion(teamId: number): Promise<ChipSuggestion> {
