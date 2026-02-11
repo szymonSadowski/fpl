@@ -160,6 +160,12 @@ export type ChipRecommendation = {
 };
 
 // Fixture types
+export type FixtureStat = {
+  identifier: string;
+  a: { value: number; element: number }[];
+  h: { value: number; element: number }[];
+};
+
 export type Fixture = {
   id: number;
   event: number;
@@ -185,6 +191,7 @@ export type EnrichedFixture = {
   awayDifficulty: number;
   finished: boolean;
   started: boolean;
+  stats: FixtureStat[];
 };
 
 // Standings types (from API-Football)
@@ -201,6 +208,41 @@ export type Standing = {
   goalDiff: number;
   points: number;
 };
+
+// Live GW types
+export type LiveElementStats = {
+  minutes: number;
+  goals_scored: number;
+  assists: number;
+  clean_sheets: number;
+  goals_conceded: number;
+  own_goals: number;
+  penalties_saved: number;
+  penalties_missed: number;
+  yellow_cards: number;
+  red_cards: number;
+  saves: number;
+  bonus: number;
+  bps: number;
+  influence: string;
+  creativity: string;
+  threat: string;
+  ict_index: string;
+  clearances_blocks_interceptions: number;
+  recoveries: number;
+  tackles: number;
+  defensive_contribution: number;
+  starts: number;
+  expected_goals: string;
+  expected_assists: string;
+  expected_goal_involvements: string;
+  expected_goals_conceded: string;
+  total_points: number;
+  in_dreamteam: boolean;
+};
+
+export type LiveElement = { id: number; stats: LiveElementStats };
+export type LiveResponse = { elements: LiveElement[] };
 
 // Enriched types (camelCase from backend)
 export type TeamInfo = {

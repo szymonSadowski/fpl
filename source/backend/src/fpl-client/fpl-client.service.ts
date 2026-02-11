@@ -111,6 +111,7 @@ export class FplClientService {
         awayDifficulty: f.team_a_difficulty,
         finished: f.finished,
         started: f.started,
+        stats: f.stats,
       };
     });
   }

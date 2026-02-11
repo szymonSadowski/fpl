@@ -2,6 +2,8 @@ import { formatPrice } from '../../lib/utils';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { PitchView } from './PitchView';
 import { GwNavigator } from './GwNavigator';
+import { PlayerGwStats } from './PlayerGwStats';
+import { GwFixtures } from './GwFixtures';
 import { useTeamOverview } from '../../hooks/useEntry';
 import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
@@ -101,6 +103,12 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
         <div className="pb-48">
           <PitchView picks={overview.picks} mode={mode} gw={gw} activeChip={overview.activeChip} />
         </div>
+        {mode !== 'future' && (
+          <>
+            <PlayerGwStats picks={overview.picks} gw={gw} activeChip={overview.activeChip} />
+            <GwFixtures gw={gw} />
+          </>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,5 +1,5 @@
 import { useGet } from './useFetch';
-import type { Team, Event, ElementType, EnrichedFixture, EnrichedPlayer } from '../types/api';
+import type { Team, Event, ElementType, EnrichedFixture, EnrichedPlayer, LiveResponse } from '../types/api';
 
 export const useTeams = () =>
   useGet<Array<Team>>({
@@ -33,6 +33,22 @@ export const useFixtures = () =>
   useGet<Array<EnrichedFixture>>({
     endpoint: '/fpl/fixtures',
     queryKey: ['fixtures'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+export const useGwFixtures = (gw: number) =>
+  useGet<Array<EnrichedFixture>>({
+    endpoint: '/fpl/fixtures',
+    queryParams: { event: gw },
+    queryKey: ['fixtures', gw],
+    staleTime: 5 * 60 * 1000,
+  });
+
+export const useEventLive = (gw: number) =>
+  useGet<LiveResponse>({
+    endpoint: '/fpl/live/{event}',
+    pathParams: { event: gw },
+    queryKey: ['live', gw],
     staleTime: 5 * 60 * 1000,
   });
 

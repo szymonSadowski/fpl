@@ -42,4 +42,5 @@ export type EnrichedFixture = {
   awayDifficulty: number;
   finished: boolean;
   started: boolean;
+  stats: FixtureStat[];
 };
