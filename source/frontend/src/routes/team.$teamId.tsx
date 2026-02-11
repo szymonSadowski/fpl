@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { LogOut, RefreshCw, BarChart3 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { SquadDisplay } from '../components/dashboard/SquadDisplay';
+import { ChipsCard } from '../components/dashboard/ChipsCard';
 import { LineupRecPanel } from '../components/dashboard/LineupRecPanel';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEvents } from '../hooks/useBootstrap';
@@ -94,6 +95,7 @@ function TeamPage() {
           />
 
           <div className="space-y-6">
+            <ChipsCard teamId={teamIdNum} gw={selectedGw} />
             <LineupRecPanel teamId={teamIdNum} gw={selectedGw} currentGw={currentGw} />
           </div>
         </div>

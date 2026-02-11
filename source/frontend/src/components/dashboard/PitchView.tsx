@@ -9,9 +9,10 @@ type PitchViewProps = {
   picks: EnrichedPick[];
   mode: GwMode;
   gw: number;
+  activeChip?: string | null;
 };
 
-export function PitchView({ picks, mode, gw }: PitchViewProps) {
+export function PitchView({ picks, mode, gw, activeChip }: PitchViewProps) {
   const { data: players } = usePlayers();
   const { data: allFixtures } = useFixtures();
 
@@ -96,15 +97,15 @@ export function PitchView({ picks, mode, gw }: PitchViewProps) {
 
       {/* Players overlay */}
       <div className="absolute inset-0 flex flex-col justify-between py-4 px-2">
-        <FormationRow picks={formation.fwd} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
-        <FormationRow picks={formation.mid} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
-        <FormationRow picks={formation.def} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
-        <FormationRow picks={formation.gk} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} />
+        <FormationRow picks={formation.fwd} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
+        <FormationRow picks={formation.mid} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
+        <FormationRow picks={formation.def} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
+        <FormationRow picks={formation.gk} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
       </div>
 
       {/* Bench */}
       <div className="absolute -bottom-40 left-0 right-0">
-        <div className="glass rounded-xl px-4 pt-5 pb-3 relative">
+        <div className={`glass rounded-xl px-4 pt-5 pb-3 relative ${activeChip === 'bboost' ? 'ring-2 ring-blue-400/60 shadow-lg shadow-blue-400/20' : ''}`}>
           <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 text-[14px] font-display tracking-widest text-text-muted uppercase bg-bg-card">Substitutes</span>
           <div className="flex items-center justify-center gap-2">
             {benchGk.map((pick) => (
@@ -114,6 +115,7 @@ export function PitchView({ picks, mode, gw }: PitchViewProps) {
                 enrichedPlayer={playerMap.get(pick.element)}
                 mode={mode}
                 nextFixtures={teamNextFixtures.get(pick.team.id)}
+                activeChip={activeChip}
               />
             ))}
             <div className="w-px h-14 bg-gradient-to-b from-transparent via-fpl-grass/40 to-transparent mx-2" />
@@ -124,6 +126,7 @@ export function PitchView({ picks, mode, gw }: PitchViewProps) {
                 enrichedPlayer={playerMap.get(pick.element)}
                 mode={mode}
                 nextFixtures={teamNextFixtures.get(pick.team.id)}
+                activeChip={activeChip}
               />
             ))}
           </div>
@@ -138,11 +141,13 @@ function FormationRow({
   playerMap,
   mode,
   teamNextFixtures,
+  activeChip,
 }: {
   picks: EnrichedPick[];
   playerMap: Map<number, EnrichedPlayer>;
   mode: GwMode;
   teamNextFixtures: Map<number, EnrichedFixture[]>;
+  activeChip?: string | null;
 }) {
   return (
     <div className="flex justify-center gap-2">
@@ -153,6 +158,7 @@ function FormationRow({
           enrichedPlayer={playerMap.get(pick.element)}
           mode={mode}
           nextFixtures={teamNextFixtures.get(pick.team.id)}
+          activeChip={activeChip}
         />
       ))}
     </div>

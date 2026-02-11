@@ -5,7 +5,14 @@ import { GwNavigator } from './GwNavigator';
 import { useTeamOverview } from '../../hooks/useEntry';
 import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
-import { Wallet, TrendingUp } from 'lucide-react';
+import { Wallet, TrendingUp, Zap } from 'lucide-react';
+
+const CHIP_META: Record<string, { label: string; color: string }> = {
+  bboost: { label: 'Bench Boost', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
+  '3xc': { label: 'Triple Captain', color: 'bg-fpl-gold/20 text-fpl-gold border-fpl-gold/40' },
+  wildcard: { label: 'Wildcard', color: 'bg-purple-500/20 text-purple-400 border-purple-500/40' },
+  freehit: { label: 'Free Hit', color: 'bg-orange-500/20 text-orange-400 border-orange-500/40' },
+};
 
 type GwMode = 'past' | 'current' | 'future';
 
@@ -68,10 +75,31 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
           </div>
           <GwNavigator gw={gw} currentGw={currentGw} onGwChange={onGwChange} />
         </div>
+        {/* Active chip banner */}
+        {overview.activeChip && CHIP_META[overview.activeChip] && (
+          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium ${CHIP_META[overview.activeChip].color}`}>
+            <Zap className="w-3 h-3" />
+            {CHIP_META[overview.activeChip].label} Active
+          </div>
+        )}
+        {/* Available chips for current/future GWs */}
+        {mode !== 'past' && !overview.activeChip && overview.availableChips.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <span className="text-text-muted">Available:</span>
+            {overview.availableChips.map((chip) => {
+              const meta = CHIP_META[chip];
+              return meta ? (
+                <span key={chip} className={`px-2 py-0.5 rounded-full border opacity-60 ${meta.color}`}>
+                  {meta.label}
+                </span>
+              ) : null;
+            })}
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <div className="pb-48">
-          <PitchView picks={overview.picks} mode={mode} gw={gw} />
+          <PitchView picks={overview.picks} mode={mode} gw={gw} activeChip={overview.activeChip} />
         </div>
       </CardContent>
     </Card>

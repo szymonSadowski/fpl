@@ -270,4 +270,7 @@ export type TeamOverview = {
   bank: number;
   value: number;
   availableChips: string[];
+  activeChip: string | null;
+  chipUsage: { name: string; event: number }[];
+  firstHalfEnd: number;
 };

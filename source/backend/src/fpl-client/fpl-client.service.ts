@@ -354,9 +354,19 @@ export class FplClientService {
       };
     });
 
+    // Chips reset at GW20 every season
+    const firstHalfEnd = 19;
+
+    // Each chip can be used once per half
     const allChips = ['wildcard', '3xc', 'bboost', 'freehit'];
-    const usedChips = new Set(history.chips.map((c) => c.name));
-    const availableChips = allChips.filter((c) => !usedChips.has(c));
+    const selectedHalf = selectedGw <= firstHalfEnd ? 1 : 2;
+    const chipsUsedInHalf = new Set(
+      history.chips
+        .filter((c) => (selectedHalf === 1 ? c.event <= firstHalfEnd : c.event > firstHalfEnd))
+        .map((c) => c.name),
+    );
+    const availableChips = allChips.filter((c) => !chipsUsedInHalf.has(c));
+    const activeChip = history.chips.find((c) => c.event === selectedGw)?.name ?? null;
 
     return {
       entry,
@@ -366,6 +376,9 @@ export class FplClientService {
       bank: picks.entry_history.bank,
       value: picks.entry_history.value,
       availableChips,
+      activeChip,
+      chipUsage: history.chips,
+      firstHalfEnd,
     };
   }
 }
