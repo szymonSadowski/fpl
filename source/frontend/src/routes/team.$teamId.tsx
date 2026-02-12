@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { LogOut, RefreshCw, BarChart3 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { SquadDisplay } from '../components/dashboard/SquadDisplay';
+import { LiveRankBar } from '../components/dashboard/LiveRankBar';
 import { ChipsCard } from '../components/dashboard/ChipsCard';
 import { LineupRecPanel } from '../components/dashboard/LineupRecPanel';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEvents } from '../hooks/useBootstrap';
-import { useEntry } from '../hooks/useEntry';
+import { useEvents, usePlayers } from '../hooks/useBootstrap';
+import { useEntry, useTeamOverview } from '../hooks/useEntry';
 
 type TeamSearch = { gw?: number };
 
@@ -47,6 +48,18 @@ function TeamPage() {
     queryClient.invalidateQueries();
   };
 
+  const { data: overview } = useTeamOverview(teamIdNum, selectedGw);
+  const { data: players } = usePlayers();
+
+  const mode = selectedGw < currentGw ? 'past' : selectedGw > currentGw ? 'future' : 'current';
+
+  const playerMap = new Map(players?.map((p) => [p.id, p]) ?? []);
+  const totalPoints = overview?.picks.reduce((sum, pick) => {
+    if (pick.gwPoints !== undefined) return sum + pick.gwPoints * pick.multiplier;
+    const player = playerMap.get(pick.element);
+    return sum + (player?.eventPoints || 0) * pick.multiplier;
+  }, 0) ?? 0;
+
   const managerName = entry
     ? `${entry.player_first_name} ${entry.player_last_name}`
     : `Team #${teamId}`;
@@ -85,7 +98,17 @@ function TeamPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        {mode !== 'future' && overview && (
+          <LiveRankBar
+            totalPoints={totalPoints}
+            overallRank={overview.overallRank}
+            rankDelta={overview.rankDelta}
+            gwRank={overview.gwRank}
+            activeChip={overview.activeChip}
+            mode={mode as 'past' | 'current'}
+          />
+        )}
         <div className="grid lg:grid-cols-3 gap-6">
           <SquadDisplay
             teamId={teamIdNum}

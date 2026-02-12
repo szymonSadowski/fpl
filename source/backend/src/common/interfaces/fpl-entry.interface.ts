@@ -18,6 +18,7 @@ export type EntryHistory = {
   points: number;
   total_points: number;
   rank: number;
+  overall_rank: number;
   bank: number;
   value: number;
 };
@@ -64,4 +65,7 @@ export type TeamOverview = {
   activeChip: string | null;
   chipUsage: { name: string; event: number }[];
   firstHalfEnd: number;
+  overallRank: number;
+  rankDelta: number | null;
+  gwRank: number | null;
 };

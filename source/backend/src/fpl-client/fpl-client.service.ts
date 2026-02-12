@@ -369,6 +369,16 @@ export class FplClientService {
     const availableChips = allChips.filter((c) => !chipsUsedInHalf.has(c));
     const activeChip = history.chips.find((c) => c.event === selectedGw)?.name ?? null;
 
+    // Rank computation — use historical overall_rank for past GWs
+    const selectedHist = history.current.find((h) => h.event === selectedGw);
+    const prevHist = history.current.find((h) => h.event === selectedGw - 1);
+    const overallRank = selectedHist?.overall_rank ?? entry.summary_overall_rank;
+    const gwRank = selectedHist?.rank ?? null;
+    const rankDelta =
+      prevHist && selectedHist
+        ? prevHist.overall_rank - selectedHist.overall_rank
+        : null;
+
     return {
       entry,
       currentEvent: currentGw,
@@ -380,6 +390,9 @@ export class FplClientService {
       activeChip,
       chipUsage: history.chips,
       firstHalfEnd,
+      overallRank,
+      rankDelta,
+      gwRank,
     };
   }
 }

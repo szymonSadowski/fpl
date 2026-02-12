@@ -7,7 +7,7 @@ import { GwFixtures } from './GwFixtures';
 import { useTeamOverview } from '../../hooks/useEntry';
 import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
-import { Wallet, TrendingUp, Zap } from 'lucide-react';
+import { Wallet, TrendingUp } from 'lucide-react';
 
 const CHIP_META: Record<string, { label: string; color: string }> = {
   bboost: { label: 'Bench Boost', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
@@ -77,13 +77,6 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
           </div>
           <GwNavigator gw={gw} currentGw={currentGw} onGwChange={onGwChange} />
         </div>
-        {/* Active chip banner */}
-        {overview.activeChip && CHIP_META[overview.activeChip] && (
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium ${CHIP_META[overview.activeChip].color}`}>
-            <Zap className="w-3 h-3" />
-            {CHIP_META[overview.activeChip].label} Active
-          </div>
-        )}
         {/* Available chips for current/future GWs */}
         {mode !== 'past' && !overview.activeChip && overview.availableChips.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap text-xs">

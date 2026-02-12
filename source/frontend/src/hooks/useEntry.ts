@@ -17,6 +17,7 @@ export type EntryHistory = {
   points: number;
   total_points: number;
   rank: number;
+  overall_rank: number;
   bank: number;
   value: number;
 };
