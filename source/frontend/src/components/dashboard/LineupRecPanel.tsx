@@ -43,7 +43,7 @@ export function LineupRecPanel({ teamId, gw, currentGw }: LineupRecPanelProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-base">OPTIMAL LINEUP</CardTitle>
-          <span className="text-xs px-2 py-1 rounded-full bg-bg-dark border border-border text-text-muted">
+          <span className="text-xs px-2 py-1 rounded-full bg-bg-dark/60 border border-border/50 text-text-muted">
             {lineup.mode === 'hindsight' ? 'Hindsight' : 'Predicted'}
           </span>
         </div>
@@ -59,7 +59,7 @@ export function LineupRecPanel({ teamId, gw, currentGw }: LineupRecPanelProps) {
         <PositionGroup label="MID" ids={filterByPosition(lineup.starting, playerMap, 3)} lineup={lineup} playerMap={playerMap} />
         <Divider />
         <PositionGroup label="FWD" ids={filterByPosition(lineup.starting, playerMap, 4)} lineup={lineup} playerMap={playerMap} />
-        <div className="border-t-2 border-border my-2" />
+        <div className="border-t-2 border-border/40 my-2" />
         <div>
           <p className="text-xs text-text-muted mb-1.5">BENCH</p>
           <div className="flex flex-wrap gap-2">
@@ -80,20 +80,20 @@ function filterByPosition(ids: number[], playerMap: Map<number, EnrichedPlayer>,
 function PointsComparison({ optimal, actual }: { optimal: number; actual: number }) {
   const diff = optimal - actual;
   return (
-    <div className="flex items-center gap-3 p-3 rounded-lg bg-bg-dark border border-border text-sm">
+    <div className="flex items-center gap-3 p-3 rounded-lg bg-bg-dark/60 border border-border/50 backdrop-blur-sm text-sm">
       <Trophy className="w-4 h-4 text-fpl-grass shrink-0" />
       <span>
         <span className="font-semibold text-fpl-grass">{optimal}</span>
         <span className="text-text-muted"> optimal</span>
       </span>
-      <span className="text-text-muted">|</span>
+      <div className="w-px h-4 bg-gradient-to-b from-transparent via-border to-transparent" />
       <span>
         <span className="font-semibold">{actual}</span>
         <span className="text-text-muted"> yours</span>
       </span>
       {diff > 0 && (
         <>
-          <span className="text-text-muted">|</span>
+          <div className="w-px h-4 bg-gradient-to-b from-transparent via-border to-transparent" />
           <span className="text-red-400 font-medium">+{diff} missed</span>
         </>
       )}
@@ -142,17 +142,17 @@ function PlayerChip({
 
   return (
     <div
-      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-sm ${
-        bench ? 'bg-bg-dark/50 border-border/50 text-text-muted' : 'bg-bg-dark border-border'
+      className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-sm transition-all duration-200 ${
+        bench ? 'bg-bg-dark/40 border-border/40 text-text-muted' : 'bg-bg-dark/60 border-border/60 hover:border-border'
       }`}
     >
       {isCaptain && (
-        <span className="shrink-0 w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs font-bold" title="Captain">
+        <span className="shrink-0 w-5 h-5 rounded-full bg-amber-500/15 text-amber-400 flex items-center justify-center text-xs font-bold" title="Captain">
           C
         </span>
       )}
       {isVC && (
-        <span className="shrink-0 w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold" title="Vice Captain">
+        <span className="shrink-0 w-5 h-5 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xs font-bold" title="Vice Captain">
           V
         </span>
       )}
@@ -166,5 +166,5 @@ function PlayerChip({
 }
 
 function Divider() {
-  return <div className="border-t border-border/50" />;
+  return <div className="border-t border-border/30" />;
 }

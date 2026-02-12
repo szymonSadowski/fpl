@@ -28,13 +28,13 @@ export function StandingsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>PREMIER LEAGUE STANDINGS</CardTitle>
+        <CardTitle>PREMIER LEAGUE <span className="text-gradient">STANDINGS</span></CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border text-text-muted">
+              <tr className="border-b border-border/60 text-text-muted">
                 <th className="text-left py-2 px-2 w-8">#</th>
                 <th className="text-left py-2 px-2">Team</th>
                 <th className="text-center py-2 px-2">P</th>
@@ -49,17 +49,17 @@ export function StandingsTable() {
             </thead>
             <tbody>
               {standings.map((s) => (
-                <tr key={s.teamId} className="border-b border-border/50 hover:bg-bg-card-hover transition-colors">
-                  <td className="py-2 px-2 text-text-muted">{s.rank}</td>
+                <tr key={s.teamId} className="border-b border-border/30 hover:bg-bg-card-hover/50 transition-colors">
+                  <td className="py-2 px-2 text-text-muted tabular-nums">{s.rank}</td>
                   <td className="py-2 px-2 font-medium">{s.teamName}</td>
-                  <td className="py-2 px-2 text-center">{s.played}</td>
-                  <td className="py-2 px-2 text-center">{s.win}</td>
-                  <td className="py-2 px-2 text-center">{s.draw}</td>
-                  <td className="py-2 px-2 text-center">{s.loss}</td>
-                  <td className="py-2 px-2 text-center">{s.goalsFor}</td>
-                  <td className="py-2 px-2 text-center">{s.goalsAgainst}</td>
-                  <td className="py-2 px-2 text-center">{s.goalDiff}</td>
-                  <td className="py-2 px-2 text-center font-bold text-fpl-grass">{s.points}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.played}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.win}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.draw}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.loss}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.goalsFor}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.goalsAgainst}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{s.goalDiff}</td>
+                  <td className="py-2 px-2 text-center font-bold text-fpl-grass tabular-nums">{s.points}</td>
                 </tr>
               ))}
             </tbody>

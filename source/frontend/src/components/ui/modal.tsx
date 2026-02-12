@@ -36,7 +36,7 @@ export function Modal({ open, onClose, children }: ModalProps) {
         if (e.target === overlayRef.current) onClose();
       }}
     >
-      <div className="relative w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl bg-bg-card border border-border shadow-2xl">
+      <div className="relative w-[95vw] sm:max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl bg-bg-card/90 backdrop-blur-xl border border-border/60 shadow-2xl shadow-black/40">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 z-10 p-1 rounded-full hover:bg-bg-dark transition-colors text-text-muted hover:text-text-primary"

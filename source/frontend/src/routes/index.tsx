@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { Hero } from '../components/landing/Hero';
 import { Features } from '../components/landing/Features';
 import { TeamIdForm } from '../components/landing/TeamIdForm';
-import { BarChart3 } from 'lucide-react';
+import { BarChart3, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 
 export const Route = createFileRoute('/')({
@@ -11,24 +11,35 @@ export const Route = createFileRoute('/')({
 
 function LandingPage() {
   return (
-    <main>
+    <main className="relative overflow-hidden">
       <Hero />
-      <Features />
       <TeamIdForm />
+      <Features />
 
-      <div className="flex justify-center py-6">
-        <Link to="/stats">
-          <Button variant="secondary" size="sm">
-            <BarChart3 className="w-4 h-4" />
-            View Stats
-          </Button>
-        </Link>
-      </div>
+      {/* CTA strip */}
+      <section className="relative py-12 px-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-fpl-pitch/10 to-transparent" />
+        <div className="relative flex flex-wrap items-center justify-center gap-4">
+          <Link to="/stats">
+            <Button variant="secondary" size="md">
+              <BarChart3 className="w-4 h-4" />
+              League Stats
+            </Button>
+          </Link>
+          <Link to="/trends">
+            <Button variant="ghost" size="md">
+              <TrendingUp className="w-4 h-4" />
+              Trends
+            </Button>
+          </Link>
+        </div>
+      </section>
 
-      <footer className="py-8 px-6 border-t border-border">
-        <div className="max-w-7xl mx-auto text-center text-sm text-text-muted">
-          <p>FPL Strategy Suite &copy; {new Date().getFullYear()}</p>
-          <p className="mt-1">Not affiliated with the Premier League or Fantasy Premier League.</p>
+      {/* Footer */}
+      <footer className="relative py-10 px-6 border-t border-border/50">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-text-muted">
+          <p className="font-display tracking-wider text-text-secondary">FPL STRATEGY SUITE</p>
+          <p>&copy; {new Date().getFullYear()} &middot; Not affiliated with the Premier League</p>
         </div>
       </footer>
     </main>

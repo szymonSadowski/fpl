@@ -73,7 +73,7 @@ export function BestPlayers() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>BEST PLAYERS</CardTitle>
+        <CardTitle>BEST <span className="text-gradient">PLAYERS</span></CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Position filter */}
@@ -82,10 +82,10 @@ export function BestPlayers() {
             <button
               key={pos.id}
               onClick={() => setPosFilter(pos.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                 posFilter === pos.id
-                  ? 'bg-fpl-grass text-bg-dark'
-                  : 'bg-bg-dark text-text-muted hover:text-text-primary border border-border'
+                  ? 'bg-fpl-grass text-bg-dark glow-grass'
+                  : 'bg-bg-dark/60 text-text-muted hover:text-text-primary border border-border/60 hover:border-border'
               }`}
             >
               {pos.label}
@@ -100,9 +100,9 @@ export function BestPlayers() {
             <button
               key={opt.key}
               onClick={() => setSortKey(opt.key)}
-              className={`px-2 py-1 rounded text-xs transition-colors ${
+              className={`px-2 py-1 rounded text-xs transition-all duration-200 ${
                 sortKey === opt.key
-                  ? 'bg-fpl-grass/20 text-fpl-grass'
+                  ? 'bg-fpl-grass/15 text-fpl-grass'
                   : 'text-text-muted hover:text-text-primary'
               }`}
             >
@@ -115,7 +115,7 @@ export function BestPlayers() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border text-text-muted">
+              <tr className="border-b border-border/60 text-text-muted">
                 <th className="text-left py-2 px-2">Pos</th>
                 <th className="text-left py-2 px-2">Name</th>
                 <th className="text-left py-2 px-2">Team</th>
@@ -129,20 +129,20 @@ export function BestPlayers() {
             </thead>
             <tbody>
               {filtered.map((p) => (
-                <tr key={p.id} className="border-b border-border/50 hover:bg-bg-card-hover transition-colors">
+                <tr key={p.id} className="border-b border-border/30 hover:bg-bg-card-hover/50 transition-colors">
                   <td className="py-2 px-2">
-                    <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/50 text-fpl-grass">
+                    <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/40 text-fpl-grass">
                       {POS_SHORT[p.position.id] ?? p.position.name}
                     </span>
                   </td>
                   <td className="py-2 px-2 font-medium">{p.webName}</td>
                   <td className="py-2 px-2 text-text-secondary">{p.team.shortName}</td>
-                  <td className="py-2 px-2 text-center font-bold text-fpl-grass">{p.points}</td>
-                  <td className="py-2 px-2 text-center">{p.form}</td>
-                  <td className="py-2 px-2 text-center">{p.goals}</td>
-                  <td className="py-2 px-2 text-center">{p.assists}</td>
-                  <td className="py-2 px-2 text-center">{p.xG}</td>
-                  <td className="py-2 px-2 text-center">{formatPrice(p.cost)}</td>
+                  <td className="py-2 px-2 text-center font-bold text-fpl-grass tabular-nums">{p.points}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{p.form}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{p.goals}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{p.assists}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{p.xG}</td>
+                  <td className="py-2 px-2 text-center tabular-nums">{formatPrice(p.cost)}</td>
                 </tr>
               ))}
             </tbody>

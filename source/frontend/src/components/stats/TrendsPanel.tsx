@@ -14,7 +14,7 @@ function PriceTable({ players }: { players: PriceChange[] }) {
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-text-muted">
+          <tr className="border-b border-border/60 text-text-muted">
             <th className="text-left py-2 px-2">Name</th>
             <th className="text-left py-2 px-2">Team</th>
             <th className="text-left py-2 px-2">Pos</th>
@@ -25,17 +25,17 @@ function PriceTable({ players }: { players: PriceChange[] }) {
         </thead>
         <tbody>
           {players.map((p) => (
-            <tr key={p.id} className="border-b border-border/50 hover:bg-bg-card-hover transition-colors">
+            <tr key={p.id} className="border-b border-border/30 hover:bg-bg-card-hover/50 transition-colors">
               <td className="py-2 px-2 font-medium">{p.webName}</td>
               <td className="py-2 px-2 text-text-secondary">{p.teamShortName}</td>
               <td className="py-2 px-2">
-                <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/50 text-fpl-grass">
+                <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/40 text-fpl-grass">
                   {p.position}
                 </span>
               </td>
-              <td className="py-2 px-2 text-center text-text-muted">{formatPrice(p.costBefore)}</td>
-              <td className="py-2 px-2 text-center">{formatPrice(p.cost)}</td>
-              <td className={`py-2 px-2 text-center font-bold ${p.costChange > 0 ? 'text-green-400' : 'text-red-400'}`}>
+              <td className="py-2 px-2 text-center text-text-muted tabular-nums">{formatPrice(p.costBefore)}</td>
+              <td className="py-2 px-2 text-center tabular-nums">{formatPrice(p.cost)}</td>
+              <td className={`py-2 px-2 text-center font-bold tabular-nums ${p.costChange > 0 ? 'text-green-400' : 'text-red-400'}`}>
                 {p.costChange > 0 ? '+' : ''}{formatPrice(p.costChange)}
               </td>
             </tr>
@@ -52,7 +52,7 @@ function TransferTable({ players, mode }: { players: TransferTrend[]; mode: Tran
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border text-text-muted">
+          <tr className="border-b border-border/60 text-text-muted">
             <th className="text-left py-2 px-2">Name</th>
             <th className="text-left py-2 px-2">Team</th>
             <th className="text-left py-2 px-2">Pos</th>
@@ -62,18 +62,18 @@ function TransferTable({ players, mode }: { players: TransferTrend[]; mode: Tran
         </thead>
         <tbody>
           {players.map((p) => (
-            <tr key={p.id} className="border-b border-border/50 hover:bg-bg-card-hover transition-colors">
+            <tr key={p.id} className="border-b border-border/30 hover:bg-bg-card-hover/50 transition-colors">
               <td className="py-2 px-2 font-medium">{p.webName}</td>
               <td className="py-2 px-2 text-text-secondary">{p.teamShortName}</td>
               <td className="py-2 px-2">
-                <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/50 text-fpl-grass">
+                <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/40 text-fpl-grass">
                   {p.position}
                 </span>
               </td>
-              <td className={`py-2 px-2 text-center font-bold ${mode === 'in' ? 'text-green-400' : 'text-red-400'}`}>
+              <td className={`py-2 px-2 text-center font-bold tabular-nums ${mode === 'in' ? 'text-green-400' : 'text-red-400'}`}>
                 {(mode === 'in' ? p.transfersIn : p.transfersOut).toLocaleString()}
               </td>
-              <td className="py-2 px-2 text-center">{p.selectedByPercent}%</td>
+              <td className="py-2 px-2 text-center tabular-nums">{p.selectedByPercent}%</td>
             </tr>
           ))}
         </tbody>
@@ -108,7 +108,7 @@ export function TrendsPanel() {
       {/* Price Changes */}
       <Card>
         <CardHeader>
-          <CardTitle>PRICE CHANGES</CardTitle>
+          <CardTitle>PRICE <span className="text-gradient">CHANGES</span></CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -116,10 +116,10 @@ export function TrendsPanel() {
               <button
                 key={tab}
                 onClick={() => setPriceTab(tab)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                   priceTab === tab
-                    ? 'bg-fpl-grass text-bg-dark'
-                    : 'bg-bg-dark text-text-muted hover:text-text-primary border border-border'
+                    ? 'bg-fpl-grass text-bg-dark glow-grass'
+                    : 'bg-bg-dark/60 text-text-muted hover:text-text-primary border border-border/60 hover:border-border'
                 }`}
               >
                 {tab === 'risers' ? 'Risers' : 'Fallers'}
@@ -133,7 +133,7 @@ export function TrendsPanel() {
       {/* Transfer Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>TRANSFER ACTIVITY</CardTitle>
+          <CardTitle>TRANSFER <span className="text-gradient">ACTIVITY</span></CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
@@ -141,10 +141,10 @@ export function TrendsPanel() {
               <button
                 key={tab}
                 onClick={() => setTransferTab(tab)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                   transferTab === tab
-                    ? 'bg-fpl-grass text-bg-dark'
-                    : 'bg-bg-dark text-text-muted hover:text-text-primary border border-border'
+                    ? 'bg-fpl-grass text-bg-dark glow-grass'
+                    : 'bg-bg-dark/60 text-text-muted hover:text-text-primary border border-border/60 hover:border-border'
                 }`}
               >
                 {tab === 'in' ? 'Most In' : 'Most Out'}

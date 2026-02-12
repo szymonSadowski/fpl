@@ -5,10 +5,10 @@ import { useTeamOverview } from '../../hooks/useEntry';
 import { Zap, Crown, Shuffle, ArrowRightLeft, Check, Circle } from 'lucide-react';
 
 const CHIPS = [
-  { key: 'wildcard', label: 'Wildcard', icon: Shuffle, accent: 'bg-purple-500/20 text-purple-400 border-purple-500/40', ring: 'ring-purple-500/40' },
-  { key: 'freehit', label: 'Free Hit', icon: ArrowRightLeft, accent: 'bg-orange-500/20 text-orange-400 border-orange-500/40', ring: 'ring-orange-500/40' },
-  { key: '3xc', label: 'Triple Captain', icon: Crown, accent: 'bg-fpl-gold/20 text-fpl-gold border-fpl-gold/40', ring: 'ring-fpl-gold/40' },
-  { key: 'bboost', label: 'Bench Boost', icon: Zap, accent: 'bg-blue-500/20 text-blue-400 border-blue-500/40', ring: 'ring-blue-500/40' },
+  { key: 'wildcard', label: 'Wildcard', icon: Shuffle, accent: 'bg-purple-500/15 text-purple-400 border-purple-500/30', ring: 'ring-purple-500/40' },
+  { key: 'freehit', label: 'Free Hit', icon: ArrowRightLeft, accent: 'bg-orange-500/15 text-orange-400 border-orange-500/30', ring: 'ring-orange-500/40' },
+  { key: '3xc', label: 'Triple Captain', icon: Crown, accent: 'bg-fpl-gold/15 text-fpl-gold border-fpl-gold/30', ring: 'ring-fpl-gold/40' },
+  { key: 'bboost', label: 'Bench Boost', icon: Zap, accent: 'bg-blue-500/15 text-blue-400 border-blue-500/30', ring: 'ring-blue-500/40' },
 ] as const;
 
 type ChipsCardProps = {
@@ -61,12 +61,12 @@ export function ChipsCard({ teamId, gw }: ChipsCardProps) {
             return (
               <div
                 key={key}
-                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border text-sm transition-all ${
+                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border text-sm transition-all duration-200 ${
                   activeHere
                     ? `${accent} ring-1 ${ring}`
                     : used
-                      ? 'bg-bg-dark/50 border-border/50 opacity-50'
-                      : 'bg-bg-dark border-border'
+                      ? 'bg-bg-dark/40 border-border/40 opacity-50'
+                      : 'bg-bg-dark/60 border-border/60 hover:border-border'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
@@ -96,4 +96,3 @@ export function ChipsCard({ teamId, gw }: ChipsCardProps) {
     </Card>
   );
 }
-

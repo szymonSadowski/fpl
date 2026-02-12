@@ -66,11 +66,15 @@ function TeamPage() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-50 glass border-b border-border">
+      {/* Ambient orbs */}
+      <div className="fixed -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-fpl-grass/5 blur-[150px] pointer-events-none" />
+      <div className="fixed -bottom-40 -left-40 w-[400px] h-[400px] rounded-full bg-fpl-pitch/20 blur-[120px] pointer-events-none" />
+
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-bg-dark/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-display tracking-wider">
-              FPL <span className="text-fpl-grass">STRATEGY</span>
+              FPL <span className="text-gradient">STRATEGY</span>
             </h1>
             {currentEvent && (
               <p className="text-sm text-text-secondary">
@@ -79,7 +83,7 @@ function TeamPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link to="/stats">
               <Button variant="ghost" size="sm">
                 <BarChart3 className="w-4 h-4" />
@@ -104,7 +108,7 @@ function TeamPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <main className="relative max-w-7xl mx-auto px-6 py-8 space-y-6">
         {mode !== 'future' && overview && (
           <LiveRankBar
             totalPoints={totalPoints}

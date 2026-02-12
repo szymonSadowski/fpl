@@ -15,7 +15,7 @@ export function GwNavigator({ gw, currentGw, onGwChange }: GwNavigatorProps) {
       <button
         disabled={gw <= 1}
         onClick={() => onGwChange(gw - 1)}
-        className="p-1.5 rounded-lg border border-border bg-bg-card hover:bg-bg-card-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
@@ -25,17 +25,17 @@ export function GwNavigator({ gw, currentGw, onGwChange }: GwNavigatorProps) {
           Gameweek {gw}
         </span>
         {isPast && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-text-muted/20 text-text-muted uppercase tracking-wider">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-text-muted/15 text-text-muted uppercase tracking-wider">
             past
           </span>
         )}
         {isFuture && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-fpl-grass/20 text-fpl-grass uppercase tracking-wider">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-fpl-grass/15 text-fpl-grass uppercase tracking-wider">
             future
           </span>
         )}
         {!isPast && !isFuture && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-fpl-gold/20 text-fpl-gold uppercase tracking-wider">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-fpl-gold/15 text-fpl-gold uppercase tracking-wider glow-grass">
             live
           </span>
         )}
@@ -44,7 +44,7 @@ export function GwNavigator({ gw, currentGw, onGwChange }: GwNavigatorProps) {
       <button
         disabled={gw >= 38}
         onClick={() => onGwChange(gw + 1)}
-        className="p-1.5 rounded-lg border border-border bg-bg-card hover:bg-bg-card-hover disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
       >
         <ChevronRight className="w-4 h-4" />
       </button>

@@ -107,7 +107,7 @@ export function PitchView({ picks, mode, gw, activeChip, onPlayerClick }: PitchV
       {/* Bench */}
       <div className="absolute -bottom-40 left-0 right-0">
         <div className={`glass rounded-xl px-4 pt-5 pb-3 relative ${activeChip === 'bboost' ? 'ring-2 ring-blue-400/60 shadow-lg shadow-blue-400/20' : ''}`}>
-          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 text-[14px] font-display tracking-widest text-text-muted uppercase bg-bg-card">Substitutes</span>
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-3 text-[14px] font-display tracking-widest text-text-muted uppercase bg-bg-card/70 backdrop-blur-sm">Substitutes</span>
           <div className="flex items-center justify-center gap-2">
             {benchGk.map((pick) => (
               <PlayerCard

@@ -1,10 +1,10 @@
 import { Trophy, ArrowUp, ArrowDown, Minus, Zap } from 'lucide-react';
 
 const CHIP_LABELS: Record<string, { label: string; color: string }> = {
-  bboost: { label: 'Bench Boost', color: 'text-blue-400 border-blue-500/40 bg-blue-500/20' },
-  '3xc': { label: 'Triple Captain', color: 'text-fpl-gold border-fpl-gold/40 bg-fpl-gold/20' },
-  wildcard: { label: 'Wildcard', color: 'text-purple-400 border-purple-500/40 bg-purple-500/20' },
-  freehit: { label: 'Free Hit', color: 'text-orange-400 border-orange-500/40 bg-orange-500/20' },
+  bboost: { label: 'Bench Boost', color: 'text-blue-400 border-blue-500/30 bg-blue-500/15' },
+  '3xc': { label: 'Triple Captain', color: 'text-fpl-gold border-fpl-gold/30 bg-fpl-gold/15' },
+  wildcard: { label: 'Wildcard', color: 'text-purple-400 border-purple-500/30 bg-purple-500/15' },
+  freehit: { label: 'Free Hit', color: 'text-orange-400 border-orange-500/30 bg-orange-500/15' },
 };
 
 type LiveRankBarProps = {
@@ -48,15 +48,15 @@ export function LiveRankBar({ totalPoints, overallRank, rankDelta, gwRank, activ
   const chip = activeChip ? CHIP_LABELS[activeChip] : null;
 
   return (
-    <div className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl glass border border-border flex-wrap">
+    <div className="w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl border border-border/50 bg-bg-card/60 backdrop-blur-sm flex-wrap">
       {mode === 'current' && (
         <>
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-fpl-gold" />
             <span className="text-text-muted text-sm">Live Pts</span>
-            <span className="font-semibold text-sm">{totalPoints}</span>
+            <span className="font-semibold text-sm text-fpl-grass">{totalPoints}</span>
           </div>
-          <span className="text-border">|</span>
+          <div className="w-px h-4 bg-gradient-to-b from-transparent via-border to-transparent" />
         </>
       )}
 
@@ -66,7 +66,7 @@ export function LiveRankBar({ totalPoints, overallRank, rankDelta, gwRank, activ
         <RankDelta delta={rankDelta} />
       </div>
 
-      <span className="text-border">|</span>
+      <div className="w-px h-4 bg-gradient-to-b from-transparent via-border to-transparent" />
 
       <div className="flex items-center gap-2">
         <span className="text-text-muted text-sm">GW Rank</span>
@@ -75,7 +75,7 @@ export function LiveRankBar({ totalPoints, overallRank, rankDelta, gwRank, activ
 
       {chip && (
         <>
-          <span className="text-border">|</span>
+          <div className="w-px h-4 bg-gradient-to-b from-transparent via-border to-transparent" />
           <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-medium ${chip.color}`}>
             <Zap className="w-3 h-3" />
             {chip.label} Active

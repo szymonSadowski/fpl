@@ -12,10 +12,10 @@ import { Loader } from '../ui/loader';
 import { Wallet, TrendingUp } from 'lucide-react';
 
 const CHIP_META: Record<string, { label: string; color: string }> = {
-  bboost: { label: 'Bench Boost', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-  '3xc': { label: 'Triple Captain', color: 'bg-fpl-gold/20 text-fpl-gold border-fpl-gold/40' },
-  wildcard: { label: 'Wildcard', color: 'bg-purple-500/20 text-purple-400 border-purple-500/40' },
-  freehit: { label: 'Free Hit', color: 'bg-orange-500/20 text-orange-400 border-orange-500/40' },
+  bboost: { label: 'Bench Boost', color: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+  '3xc': { label: 'Triple Captain', color: 'bg-fpl-gold/15 text-fpl-gold border-fpl-gold/30' },
+  wildcard: { label: 'Wildcard', color: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
+  freehit: { label: 'Free Hit', color: 'bg-orange-500/15 text-orange-400 border-orange-500/30' },
 };
 
 type GwMode = 'past' | 'current' | 'future';
@@ -70,17 +70,17 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <CardTitle>MY SQUAD</CardTitle>
-            <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-2 text-sm">
               {mode !== 'future' && (
-                <StatPill icon={<TrendingUp className="w-4 h-4" />} label="GW Pts" value={totalPoints.toString()} />
+                <StatPill icon={<TrendingUp className="w-3.5 h-3.5" />} label="GW" value={totalPoints.toString()} accent />
               )}
-              <StatPill icon={<Wallet className="w-4 h-4" />} label="Bank" value={formatPrice(overview.bank)} />
-              <StatPill icon={<Wallet className="w-4 h-4" />} label="Value" value={formatPrice(overview.value)} />
+              <StatPill icon={<Wallet className="w-3.5 h-3.5" />} label="Bank" value={formatPrice(overview.bank)} />
+              <StatPill icon={<Wallet className="w-3.5 h-3.5" />} label="Value" value={formatPrice(overview.value)} />
             </div>
           </div>
           <GwNavigator gw={gw} currentGw={currentGw} onGwChange={onGwChange} />
         </div>
-        {/* Available chips for current/future GWs */}
+        {/* Available chips */}
         {mode !== 'past' && !overview.activeChip && overview.availableChips.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap text-xs">
             <span className="text-text-muted">Available:</span>
@@ -115,12 +115,15 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
   );
 }
 
-function StatPill({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function StatPill({ icon, label, value, accent }: { icon: React.ReactNode; label: string; value: string; accent?: boolean }) {
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg-dark border border-border">
-      <span className="text-fpl-grass">{icon}</span>
-      <span className="text-text-muted">{label}</span>
-      <span className="font-medium">{value}</span>
+    <div className={`
+      flex items-center gap-2 px-3 py-1.5 rounded-full border
+      ${accent ? 'bg-fpl-grass/10 border-fpl-grass/20 glow-grass' : 'bg-bg-dark/60 border-border/60'}
+    `}>
+      <span className={accent ? 'text-fpl-grass' : 'text-fpl-grass/70'}>{icon}</span>
+      <span className="text-text-muted text-xs">{label}</span>
+      <span className="font-medium text-xs">{value}</span>
     </div>
   );
 }

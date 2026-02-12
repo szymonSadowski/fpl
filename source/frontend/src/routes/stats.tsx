@@ -11,12 +11,12 @@ export const Route = createFileRoute('/stats')({
 function StatsPage() {
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-50 glass border-b border-border">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-bg-dark/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-display tracking-wider">
-            FPL <span className="text-fpl-grass">STATS</span>
+            FPL <span className="text-gradient">STATS</span>
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link to="/trends">
               <Button variant="ghost" size="sm">
                 <TrendingUp className="w-4 h-4" />

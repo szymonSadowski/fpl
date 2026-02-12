@@ -96,7 +96,7 @@ export function PlayerDetailModal({ playerId, purchasePrice, onClose }: PlayerDe
             })()}
 
             {/* Toggle tabs */}
-            <div className="flex gap-1 border-b border-border">
+            <div className="flex gap-1 border-b border-border/40">
               <TabButton active={tab === 'results'} onClick={() => setTab('results')}>
                 Results
               </TabButton>
@@ -110,7 +110,7 @@ export function PlayerDetailModal({ playerId, purchasePrice, onClose }: PlayerDe
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-text-muted text-xs">
+                    <tr className="border-b border-border/60 text-text-muted text-xs">
                       <th className="text-left py-1.5 pr-2 font-medium">GW</th>
                       <th className="text-left py-1.5 px-2 font-medium">Opp</th>
                       <th className="text-center py-1.5 px-1 font-medium">Res</th>
@@ -127,7 +127,7 @@ export function PlayerDetailModal({ playerId, purchasePrice, onClose }: PlayerDe
                       const unplayed = h.minutes === 0 && h.totalPoints === 0;
                       const diff = unplayed ? findDifficulty(summary, h) : null;
                       return (
-                        <tr key={h.round} className={`border-b border-border/50 ${unplayed ? 'opacity-60' : ''}`}>
+                        <tr key={h.round} className={`border-b border-border/30 ${unplayed ? 'opacity-60' : ''}`}>
                           <td className="py-1 pr-2 tabular-nums">{h.round}</td>
                           <td className="py-1 px-2 text-text-secondary">
                             {h.opponentShortName} ({h.wasHome ? 'H' : 'A'})
@@ -168,7 +168,7 @@ export function PlayerDetailModal({ playerId, purchasePrice, onClose }: PlayerDe
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-border text-text-muted text-xs">
+                    <tr className="border-b border-border/60 text-text-muted text-xs">
                       <th className="text-left py-1.5 pr-2 font-medium">Date</th>
                       <th className="text-center py-1.5 px-2 font-medium">GW</th>
                       <th className="text-left py-1.5 px-2 font-medium">Opp</th>
@@ -177,7 +177,7 @@ export function PlayerDetailModal({ playerId, purchasePrice, onClose }: PlayerDe
                   </thead>
                   <tbody>
                     {summary.fixtures.filter((f) => f.event > (summary.history.length > 0 ? Math.max(...summary.history.map((h) => h.round)) : 0)).map((f) => (
-                      <tr key={f.event} className="border-b border-border/50">
+                      <tr key={f.event} className="border-b border-border/30">
                         <td className="py-1 pr-2 text-text-secondary text-xs">
                           {new Date(f.kickoffTime).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                         </td>
@@ -234,7 +234,7 @@ function PlayerPhoto({ url, position }: { url: string; position: string }) {
 
 function Pill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="text-center px-2 py-1.5 rounded-lg bg-bg-dark border border-border">
+    <div className="text-center px-2 py-1.5 rounded-lg bg-bg-dark/60 border border-border/50 backdrop-blur-sm">
       <div className="text-[10px] text-text-muted uppercase">{label}</div>
       <div className="text-sm font-bold">{value}</div>
     </div>
@@ -244,7 +244,7 @@ function Pill({ label, value }: { label: string; value: string }) {
 function FormPill({ history: h, difficulty }: { history: EnrichedPlayerHistory; difficulty: number | null }) {
   const unplayed = h.minutes === 0 && h.totalPoints === 0;
   return (
-    <div className="flex-1 text-center px-2 py-1.5 rounded-lg bg-bg-dark border border-border">
+    <div className="flex-1 text-center px-2 py-1.5 rounded-lg bg-bg-dark/60 border border-border/50">
       <div className="text-[10px] text-text-muted">GW{h.round}</div>
       <div className="text-xs text-text-secondary">
         {h.opponentShortName} ({h.wasHome ? 'H' : 'A'})
@@ -264,7 +264,7 @@ function FormPill({ history: h, difficulty }: { history: EnrichedPlayerHistory; 
 
 function FixturePill({ fixture: f }: { fixture: EnrichedPlayerFixture }) {
   return (
-    <div className="flex-1 text-center px-2 py-1.5 rounded-lg bg-bg-dark border border-border">
+    <div className="flex-1 text-center px-2 py-1.5 rounded-lg bg-bg-dark/60 border border-border/50">
       <div className="text-[10px] text-text-muted">GW{f.event}</div>
       <div className="text-xs text-text-secondary">
         {f.opponentShortName} ({f.isHome ? 'H' : 'A'})

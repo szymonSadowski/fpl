@@ -51,7 +51,7 @@ function FixtureCard({
   const hasStats = fix.started && fix.stats && fix.stats.length > 0;
 
   return (
-    <div className="rounded-lg bg-bg-dark border border-border p-3">
+    <div className="rounded-lg bg-bg-dark/60 border border-border/50 backdrop-blur-sm p-3 hover:border-border transition-colors">
       {/* Score line */}
       <div className="flex items-center justify-between gap-2">
         <TeamBadge name={fix.homeTeam.shortName} fdr={fix.homeDifficulty} />
@@ -77,9 +77,9 @@ function FixtureCard({
         <TeamBadge name={fix.awayTeam.shortName} fdr={fix.awayDifficulty} />
       </div>
 
-      {/* Stat details for started fixtures */}
+      {/* Stat details */}
       {hasStats && (
-        <div className="mt-2 pt-2 border-t border-border/50 space-y-1">
+        <div className="mt-2 pt-2 border-t border-border/30 space-y-1">
           {STAT_DISPLAY_ORDER.map((statId) => {
             const stat = fix.stats.find((s) => s.identifier === statId);
             if (!stat || (stat.h.length === 0 && stat.a.length === 0)) return null;
@@ -136,7 +136,7 @@ function StatRow({
     <div className="flex items-start text-xs gap-2">
       <span className="text-text-muted w-12 shrink-0">{label}</span>
       <span className="flex-1 text-right truncate">{homeStr || '-'}</span>
-      <span className="text-text-muted">|</span>
+      <span className="text-border">|</span>
       <span className="flex-1 truncate">{awayStr || '-'}</span>
     </div>
   );

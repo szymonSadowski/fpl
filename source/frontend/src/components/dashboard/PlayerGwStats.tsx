@@ -28,7 +28,6 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
 
   const isBenchBoost = activeChip === 'bboost';
 
-  // Rows: starters always, bench players if bench boost or they have minutes
   const rows = useMemo(() => {
     return picks
       .filter((p) => {
@@ -39,7 +38,6 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
       .sort((a, b) => a.position - b.position);
   }, [picks, liveMap, isBenchBoost]);
 
-  // Combined totals for featured players
   const featuredPicks = picks.filter((p) => isBenchBoost || p.position <= 11);
   const totals = useMemo(() => {
     const sums: Record<string, number> = {};
@@ -58,7 +56,6 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
 
   if (!live || rows.length === 0) return null;
 
-  // Don't render if nobody has played yet
   const anyMinutes = rows.some((p) => {
     const st = liveMap.get(p.element);
     return st && st.minutes > 0;
@@ -72,11 +69,11 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
       </h4>
 
       {/* Combined totals bar */}
-      <div className="flex items-center gap-3 mb-3 px-3 py-2 rounded-lg bg-bg-dark border border-border">
+      <div className="flex items-center gap-3 mb-3 px-3 py-2 rounded-lg bg-bg-dark/60 border border-border/50 backdrop-blur-sm">
         <span className="text-xs text-text-muted uppercase tracking-wide mr-auto">
           Combined{isBenchBoost ? ' (BB)' : ''}
         </span>
-        <TotalCell label="PTS" value={totals.pts} />
+        <TotalCell label="PTS" value={totals.pts} accent />
         {STAT_COLS.map((c) => (
           <TotalCell key={c.key} label={c.label} value={totals[c.key]} />
         ))}
@@ -86,7 +83,7 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border text-text-muted text-xs">
+            <tr className="border-b border-border/60 text-text-muted text-xs">
               <th className="text-left py-2 pr-4 font-medium">Player</th>
               <th className="text-center py-2 px-2 font-medium w-12">PTS</th>
               {STAT_COLS.map((c) => (
@@ -109,7 +106,7 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
               return (
                 <tr
                   key={pick.element}
-                  className={`border-b border-border/50 ${(isBench && !isBenchBoost) || noMinutes ? 'opacity-50' : ''}`}
+                  className={`border-b border-border/30 hover:bg-bg-card-hover/50 transition-colors ${(isBench && !isBenchBoost) || noMinutes ? 'opacity-50' : ''}`}
                 >
                   <td className="py-1.5 pr-4">
                     <span className="font-medium">{pick.webName}</span>
@@ -143,11 +140,11 @@ export function PlayerGwStats({ picks, gw, activeChip }: PlayerGwStatsProps) {
   );
 }
 
-function TotalCell({ label, value }: { label: string; value: number }) {
+function TotalCell({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div className="text-center min-w-[2.5rem]">
       <div className="text-[10px] text-text-muted">{label}</div>
-      <div className={`text-sm tabular-nums font-bold ${value > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
+      <div className={`text-sm tabular-nums font-bold ${accent && value > 0 ? 'text-fpl-grass' : value > 0 ? 'text-text-primary' : 'text-text-muted'}`}>
         {value}
       </div>
     </div>
@@ -158,7 +155,7 @@ function StatCell({ value, highlight }: { value: number; highlight?: boolean }) 
   return (
     <td className={`text-center py-1.5 px-2 tabular-nums ${
       value > 0
-        ? highlight ? 'text-text-primary font-bold' : 'text-text-primary font-medium'
+        ? highlight ? 'text-fpl-grass font-bold' : 'text-text-primary font-medium'
         : 'text-text-muted'
     }`}>
       {value}
