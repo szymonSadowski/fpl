@@ -259,6 +259,7 @@ export type PositionInfo = {
 
 export type EnrichedPlayer = {
   id: number;
+  code: number;
   webName: string;
   firstName: string;
   secondName: string;
@@ -266,6 +267,7 @@ export type EnrichedPlayer = {
   position: PositionInfo;
   cost: number;
   points: number;
+  pointsPerGame: string;
   eventPoints: number;
   form: string;
   goals: number;
@@ -282,6 +284,35 @@ export type EnrichedPlayer = {
   ictIndex: string;
 };
 
+// Element summary types (player detail)
+export type EnrichedPlayerHistory = {
+  round: number;
+  opponentShortName: string;
+  totalPoints: number;
+  wasHome: boolean;
+  teamHScore: number | null;
+  teamAScore: number | null;
+  minutes: number;
+  goalsScored: number;
+  assists: number;
+  cleanSheets: number;
+  bonus: number;
+  bps: number;
+};
+
+export type EnrichedPlayerFixture = {
+  event: number;
+  opponentShortName: string;
+  isHome: boolean;
+  difficulty: number;
+  kickoffTime: string;
+};
+
+export type ElementSummaryResponse = {
+  history: EnrichedPlayerHistory[];
+  fixtures: EnrichedPlayerFixture[];
+};
+
 export type EnrichedPick = {
   element: number;
   position: number;
@@ -292,6 +323,8 @@ export type EnrichedPick = {
   team: TeamInfo;
   playerPosition: PositionInfo;
   cost: number;
+  purchasePrice: number;
+  sellingPrice: number;
   gwPoints?: number;
   opponent?: { shortName: string; isHome: boolean };
 };

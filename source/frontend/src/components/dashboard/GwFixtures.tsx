@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useGwFixtures, usePlayers } from '../../hooks/useBootstrap';
+import { FDR_COLORS } from '../../lib/utils';
 import type { EnrichedFixture, EnrichedPlayer } from '../../types/api';
 
 const STAT_LABELS: Record<string, string> = {
@@ -10,14 +11,6 @@ const STAT_LABELS: Record<string, string> = {
 };
 
 const STAT_DISPLAY_ORDER = ['goals_scored', 'assists', 'bonus', 'bps'];
-
-const FDR_COLORS: Record<number, string> = {
-  1: 'bg-green-600 text-white',
-  2: 'bg-green-500 text-white',
-  3: 'bg-gray-500 text-white',
-  4: 'bg-red-500 text-white',
-  5: 'bg-red-700 text-white',
-};
 
 type GwFixturesProps = {
   gw: number;

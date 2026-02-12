@@ -10,9 +10,10 @@ type PitchViewProps = {
   mode: GwMode;
   gw: number;
   activeChip?: string | null;
+  onPlayerClick?: (elementId: number) => void;
 };
 
-export function PitchView({ picks, mode, gw, activeChip }: PitchViewProps) {
+export function PitchView({ picks, mode, gw, activeChip, onPlayerClick }: PitchViewProps) {
   const { data: players } = usePlayers();
   const { data: allFixtures } = useFixtures();
 
@@ -97,10 +98,10 @@ export function PitchView({ picks, mode, gw, activeChip }: PitchViewProps) {
 
       {/* Players overlay */}
       <div className="absolute inset-0 flex flex-col justify-between py-4 px-2">
-        <FormationRow picks={formation.fwd} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
-        <FormationRow picks={formation.mid} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
-        <FormationRow picks={formation.def} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
-        <FormationRow picks={formation.gk} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} />
+        <FormationRow picks={formation.fwd} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} onPlayerClick={onPlayerClick} />
+        <FormationRow picks={formation.mid} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} onPlayerClick={onPlayerClick} />
+        <FormationRow picks={formation.def} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} onPlayerClick={onPlayerClick} />
+        <FormationRow picks={formation.gk} playerMap={playerMap} mode={mode} teamNextFixtures={teamNextFixtures} activeChip={activeChip} onPlayerClick={onPlayerClick} />
       </div>
 
       {/* Bench */}
@@ -116,6 +117,7 @@ export function PitchView({ picks, mode, gw, activeChip }: PitchViewProps) {
                 mode={mode}
                 nextFixtures={teamNextFixtures.get(pick.team.id)}
                 activeChip={activeChip}
+                onClick={onPlayerClick}
               />
             ))}
             <div className="w-px h-14 bg-gradient-to-b from-transparent via-fpl-grass/40 to-transparent mx-2" />
@@ -127,6 +129,7 @@ export function PitchView({ picks, mode, gw, activeChip }: PitchViewProps) {
                 mode={mode}
                 nextFixtures={teamNextFixtures.get(pick.team.id)}
                 activeChip={activeChip}
+                onClick={onPlayerClick}
               />
             ))}
           </div>
@@ -142,12 +145,14 @@ function FormationRow({
   mode,
   teamNextFixtures,
   activeChip,
+  onPlayerClick,
 }: {
   picks: EnrichedPick[];
   playerMap: Map<number, EnrichedPlayer>;
   mode: GwMode;
   teamNextFixtures: Map<number, EnrichedFixture[]>;
   activeChip?: string | null;
+  onPlayerClick?: (elementId: number) => void;
 }) {
   return (
     <div className="flex justify-center gap-2">
@@ -159,6 +164,7 @@ function FormationRow({
           mode={mode}
           nextFixtures={teamNextFixtures.get(pick.team.id)}
           activeChip={activeChip}
+          onClick={onPlayerClick}
         />
       ))}
     </div>

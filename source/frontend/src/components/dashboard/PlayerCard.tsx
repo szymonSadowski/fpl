@@ -11,9 +11,10 @@ type PlayerCardProps = {
   mode?: GwMode;
   nextFixtures?: EnrichedFixture[];
   activeChip?: string | null;
+  onClick?: (elementId: number) => void;
 };
 
-export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', nextFixtures, activeChip }: PlayerCardProps) {
+export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', nextFixtures, activeChip, onClick }: PlayerCardProps) {
   const position = getPositionName(pick.playerPosition.id);
   const eventPoints = enrichedPlayer?.eventPoints ?? 0;
   const status = enrichedPlayer?.status ?? 'a';
@@ -39,7 +40,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-2 rounded-lg bg-bg-card hover:bg-bg-card-hover transition-colors">
+      <div className="flex items-center gap-3 p-2 rounded-lg bg-bg-card hover:bg-bg-card-hover transition-colors cursor-pointer" onClick={() => onClick?.(pick.element)}>
         <div className="w-8 h-8 rounded-full bg-fpl-pitch/50 flex items-center justify-center text-xs font-medium text-fpl-grass">
           {position}
         </div>
@@ -72,7 +73,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
   }
 
   return (
-    <div className="relative group">
+    <div className="relative group cursor-pointer" onClick={() => onClick?.(pick.element)}>
       <div className="w-20 flex flex-col items-center">
         {/* Jersey */}
         <div className="relative w-12 h-12 rounded-full bg-gradient-to-b from-fpl-pitch to-fpl-pitch/70 flex items-center justify-center mb-1 border-2 border-fpl-grass/30 group-hover:border-fpl-grass transition-colors">

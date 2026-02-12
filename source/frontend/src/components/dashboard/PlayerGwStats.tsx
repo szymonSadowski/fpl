@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useEventLive } from '../../hooks/useBootstrap';
+import { DEFCON_THRESHOLD, calcDefconPts } from '../../lib/utils';
 import type { EnrichedPick, LiveElementStats } from '../../types/api';
 
 const STAT_COLS: { key: keyof LiveElementStats; label: string }[] = [
@@ -10,15 +11,6 @@ const STAT_COLS: { key: keyof LiveElementStats; label: string }[] = [
   { key: 'bonus', label: 'BNS' },
   { key: 'bps', label: 'BPS' },
 ];
-
-// DEFCON thresholds per position: posId → DC needed for 2 pts (GK can't earn)
-const DEFCON_THRESHOLD: Record<number, number> = { 2: 10, 3: 12, 4: 12 };
-
-function calcDefconPts(posId: number, dc: number): number {
-  const threshold = DEFCON_THRESHOLD[posId];
-  if (!threshold) return 0; // GK (1) can't earn
-  return Math.floor(dc / threshold) * 2;
-}
 
 type PlayerGwStatsProps = {
   picks: EnrichedPick[];

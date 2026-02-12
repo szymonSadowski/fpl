@@ -10,6 +10,7 @@ import { FplClientService } from './fpl-client.service';
 import { Team, EnrichedPlayer, Event, ElementType } from '../common/interfaces/fpl-bootstrap.interface';
 import { EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
 import { LiveResponse } from '../common/interfaces/fpl-live.interface';
+import { ElementSummaryResponse } from '../common/interfaces/fpl-element-summary.interface';
 
 @ApiTags('FPL')
 @Controller('fpl')
@@ -47,6 +48,15 @@ export class FplClientController {
     @Query('event', new ParseIntPipe({ optional: true })) event?: number,
   ): Promise<EnrichedFixture[]> {
     return this.fplClientService.getFixtures(event);
+  }
+
+  @Get('element-summary/:id')
+  @ApiOperation({ summary: 'Get player history + upcoming fixtures' })
+  @ApiParam({ name: 'id', description: 'Player element ID', example: 1 })
+  async getElementSummary(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ElementSummaryResponse> {
+    return this.fplClientService.getElementSummary(id);
   }
 
   @Get('live/:event')

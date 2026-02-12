@@ -120,6 +120,7 @@ export type PositionInfo = {
 
 export type EnrichedPlayer = {
   id: number;
+  code: number;
   webName: string;
   firstName: string;
   secondName: string;

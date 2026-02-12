@@ -50,6 +50,8 @@ export type EnrichedPick = {
   team: TeamInfo;
   playerPosition: PositionInfo;
   cost: number;
+  purchasePrice: number;
+  sellingPrice: number;
   gwPoints?: number;
   opponent?: { shortName: string; isHome: boolean };
 };

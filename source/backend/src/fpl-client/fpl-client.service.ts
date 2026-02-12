@@ -8,6 +8,7 @@ import { BootstrapStatic, Team, Player, EnrichedPlayer, Event, ElementType } fro
 import { Fixture, EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
 import { Entry, EntryPicks, EntryHistoryResponse, TeamOverview, EnrichedPick } from '../common/interfaces/fpl-entry.interface';
 import { LiveResponse } from '../common/interfaces/fpl-live.interface';
+import { ElementSummaryRaw, ElementSummaryResponse } from '../common/interfaces/fpl-element-summary.interface';
 
 const TTL_24H = 86400000;
 const TTL_1H = 3600000;
@@ -141,6 +142,7 @@ export class FplClientService {
       const pos = posMap.get(p.element_type);
       return {
         id: p.id,
+        code: p.code,
         webName: p.web_name,
         firstName: p.first_name,
         secondName: p.second_name,
@@ -284,6 +286,53 @@ export class FplClientService {
     return standings.map((s, i) => ({ rank: i + 1, ...s }));
   }
 
+  async getElementSummary(elementId: number): Promise<ElementSummaryResponse> {
+    const cacheKey = `element-summary-${elementId}`;
+    const cached = await this.cacheManager.get<ElementSummaryResponse>(cacheKey);
+    if (cached) return cached;
+
+    const [{ data: raw }, teams] = await Promise.all([
+      firstValueFrom(
+        this.httpService.get<ElementSummaryRaw>(
+          `${this.baseUrl}/element-summary/${elementId}/`,
+        ),
+      ),
+      this.getTeams(),
+    ]);
+
+    const teamMap = new Map(teams.map((t) => [t.id, t.short_name]));
+
+    const history = raw.history.map((h) => ({
+      round: h.round,
+      opponentShortName: teamMap.get(h.opponent_team) ?? '',
+      totalPoints: h.total_points,
+      wasHome: h.was_home,
+      teamHScore: h.team_h_score,
+      teamAScore: h.team_a_score,
+      minutes: h.minutes,
+      goalsScored: h.goals_scored,
+      assists: h.assists,
+      cleanSheets: h.clean_sheets,
+      bonus: h.bonus,
+      bps: h.bps,
+    }));
+
+    const fixtures = raw.fixtures.map((f) => {
+      const oppTeamId = f.is_home ? f.team_a : f.team_h;
+      return {
+        event: f.event,
+        opponentShortName: teamMap.get(oppTeamId) ?? '',
+        isHome: f.is_home,
+        difficulty: f.difficulty,
+        kickoffTime: f.kickoff_time,
+      };
+    });
+
+    const result: ElementSummaryResponse = { history, fixtures };
+    await this.cacheManager.set(cacheKey, result, TTL_5MIN);
+    return result;
+  }
+
   async getTeamOverview(teamId: number, event?: number): Promise<TeamOverview> {
     const [entry, events, history, players, teams, positions] = await Promise.all([
       this.getEntry(teamId),
@@ -350,6 +399,8 @@ export class FplClientService {
         team: { id: team?.id ?? 0, name: team?.name ?? '', shortName: team?.short_name ?? '' },
         playerPosition: { id: pos?.id ?? 0, name: pos?.singular_name ?? '' },
         cost: player ? player.now_cost : 0,
+        purchasePrice: pick.purchase_price,
+        sellingPrice: pick.selling_price,
         gwPoints: liveMap?.get(pick.element),
         opponent,
       };

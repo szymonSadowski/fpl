@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { formatPrice } from '../../lib/utils';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { PitchView } from './PitchView';
 import { GwNavigator } from './GwNavigator';
 import { PlayerGwStats } from './PlayerGwStats';
 import { GwFixtures } from './GwFixtures';
+import { PlayerDetailModal } from './PlayerDetailModal';
 import { useTeamOverview } from '../../hooks/useEntry';
 import { usePlayers } from '../../hooks/useBootstrap';
 import { Loader } from '../ui/loader';
@@ -26,6 +28,7 @@ type SquadDisplayProps = {
 };
 
 export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplayProps) {
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const { data: overview, isLoading: overviewLoading, isError: overviewError } = useTeamOverview(teamId, gw);
   const { data: players, isLoading: playersLoading } = usePlayers();
 
@@ -94,7 +97,7 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
       </CardHeader>
       <CardContent>
         <div className="pb-48">
-          <PitchView picks={overview.picks} mode={mode} gw={gw} activeChip={overview.activeChip} />
+          <PitchView picks={overview.picks} mode={mode} gw={gw} activeChip={overview.activeChip} onPlayerClick={setSelectedPlayerId} />
         </div>
         {mode !== 'future' && (
           <>
@@ -103,6 +106,11 @@ export function SquadDisplay({ teamId, gw, currentGw, onGwChange }: SquadDisplay
           </>
         )}
       </CardContent>
+      <PlayerDetailModal
+        playerId={selectedPlayerId}
+        purchasePrice={overview.picks.find((p) => p.element === selectedPlayerId)?.purchasePrice}
+        onClose={() => setSelectedPlayerId(null)}
+      />
     </Card>
   );
 }

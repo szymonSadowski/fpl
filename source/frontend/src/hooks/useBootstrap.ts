@@ -1,5 +1,5 @@
 import { useGet } from './useFetch';
-import type { Team, Event, ElementType, EnrichedFixture, EnrichedPlayer, LiveResponse } from '../types/api';
+import type { Team, Event, ElementType, EnrichedFixture, EnrichedPlayer, LiveResponse, ElementSummaryResponse } from '../types/api';
 
 export const useTeams = () =>
   useGet<Array<Team>>({
@@ -50,6 +50,15 @@ export const useEventLive = (gw: number) =>
     pathParams: { event: gw },
     queryKey: ['live', gw],
     staleTime: 5 * 60 * 1000,
+  });
+
+export const useElementSummary = (elementId: number | null) =>
+  useGet<ElementSummaryResponse>({
+    endpoint: '/fpl/element-summary/{id}',
+    pathParams: { id: elementId ?? undefined },
+    queryKey: ['element-summary', elementId],
+    staleTime: 5 * 60 * 1000,
+    enabled: elementId !== null,
   });
 
 export function useCurrentEvent() {
