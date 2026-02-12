@@ -12,4 +12,10 @@ export class StatsController {
   async getStandings() {
     return this.statsService.getStandings();
   }
+
+  @Get('trends')
+  @ApiOperation({ summary: 'Price changes & transfer activity trends' })
+  async getTrends() {
+    return this.statsService.getTrends();
+  }
 }

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { LogOut, RefreshCw, BarChart3 } from 'lucide-react';
+import { LogOut, RefreshCw, BarChart3, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { SquadDisplay } from '../components/dashboard/SquadDisplay';
 import { LiveRankBar } from '../components/dashboard/LiveRankBar';
@@ -84,6 +84,12 @@ function TeamPage() {
               <Button variant="ghost" size="sm">
                 <BarChart3 className="w-4 h-4" />
                 Stats
+              </Button>
+            </Link>
+            <Link to="/trends">
+              <Button variant="ghost" size="sm">
+                <TrendingUp className="w-4 h-4" />
+                Trends
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={handleRefresh}>

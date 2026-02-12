@@ -245,6 +245,33 @@ export type LiveElementStats = {
 export type LiveElement = { id: number; stats: LiveElementStats };
 export type LiveResponse = { elements: LiveElement[] };
 
+// Trends types
+export type TrendPlayer = {
+  id: number;
+  webName: string;
+  teamShortName: string;
+  position: string;
+  cost: number;
+};
+
+export type PriceChange = TrendPlayer & {
+  costBefore: number;
+  costChange: number;
+};
+
+export type TransferTrend = TrendPlayer & {
+  transfersIn: number;
+  transfersOut: number;
+  selectedByPercent: string;
+};
+
+export type TrendsResponse = {
+  priceRisers: PriceChange[];
+  priceFallers: PriceChange[];
+  topTransfersIn: TransferTrend[];
+  topTransfersOut: TransferTrend[];
+};
+
 // Enriched types (camelCase from backend)
 export type TeamInfo = {
   id: number;

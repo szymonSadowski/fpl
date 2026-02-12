@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Home } from 'lucide-react';
+import { Home, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { StandingsTable } from '../components/stats/StandingsTable';
 import { BestPlayers } from '../components/stats/BestPlayers';
@@ -16,12 +16,20 @@ function StatsPage() {
           <h1 className="text-2xl font-display tracking-wider">
             FPL <span className="text-fpl-grass">STATS</span>
           </h1>
-          <Link to="/">
-            <Button variant="ghost" size="sm">
-              <Home className="w-4 h-4" />
-              Home
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/trends">
+              <Button variant="ghost" size="sm">
+                <TrendingUp className="w-4 h-4" />
+                Trends
+              </Button>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" size="sm">
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
+            </Link>
+          </div>
         </div>
       </header>
 

@@ -13,6 +13,8 @@ const POSITIONS = [
   { id: 4, label: 'FWD' },
 ];
 
+const POS_SHORT: Record<number, string> = { 1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD' };
+
 type SortKey = 'points' | 'form' | 'goals' | 'xG' | 'cost' | 'selectedByPercent';
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
@@ -130,7 +132,7 @@ export function BestPlayers() {
                 <tr key={p.id} className="border-b border-border/50 hover:bg-bg-card-hover transition-colors">
                   <td className="py-2 px-2">
                     <span className="inline-flex items-center justify-center w-7 h-5 rounded text-[10px] font-medium bg-fpl-pitch/50 text-fpl-grass">
-                      {p.position.name}
+                      {POS_SHORT[p.position.id] ?? p.position.name}
                     </span>
                   </td>
                   <td className="py-2 px-2 font-medium">{p.webName}</td>
