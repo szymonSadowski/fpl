@@ -8,5 +8,6 @@ import { StatsModule } from '../stats/stats.module';
   imports: [FplClientModule, StatsModule],
   controllers: [RecommendationController],
   providers: [RecommendationService],
+  exports: [RecommendationService],
 })
 export class RecommendationModule {}

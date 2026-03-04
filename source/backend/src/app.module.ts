@@ -7,6 +7,7 @@ import { FplClientModule } from './fpl-client/fpl-client.module';
 import { StatsModule } from './stats/stats.module';
 import { RecommendationModule } from './recommendation/recommendation.module';
 import { TeamsModule } from './teams/teams.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TeamsModule } from './teams/teams.module';
     StatsModule,
     RecommendationModule,
     TeamsModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

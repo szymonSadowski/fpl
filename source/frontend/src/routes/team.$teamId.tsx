@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { LogOut, RefreshCw, BarChart3, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { LogOut, RefreshCw, BarChart3, TrendingUp, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { SquadDisplay } from '../components/dashboard/SquadDisplay';
 import { LiveRankBar } from '../components/dashboard/LiveRankBar';
@@ -8,6 +9,8 @@ import { LineupRecPanel } from '../components/dashboard/LineupRecPanel';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEvents, usePlayers } from '../hooks/useBootstrap';
 import { useEntry, useTeamOverview } from '../hooks/useEntry';
+import { AiStrategyPanel } from '../components/ai/AiStrategyPanel';
+import { AiChatPanel } from '../components/ai/AiChatPanel';
 
 type TeamSearch = { gw?: number };
 
@@ -20,6 +23,7 @@ export const Route = createFileRoute('/team/$teamId')({
 
 function TeamPage() {
   const navigate = useNavigate();
+  const [aiOpen, setAiOpen] = useState(false);
   const { teamId } = Route.useParams();
   const { gw } = Route.useSearch();
   const teamIdNum = parseInt(teamId, 10);
@@ -130,9 +134,21 @@ function TeamPage() {
           <div className="space-y-6">
             <ChipsCard teamId={teamIdNum} gw={selectedGw} />
             <LineupRecPanel teamId={teamIdNum} gw={selectedGw} currentGw={currentGw} />
+            <AiStrategyPanel teamId={teamIdNum} />
           </div>
         </div>
       </main>
+
+      {/* Floating AI chat button */}
+      <button
+        onClick={() => setAiOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-fpl-gold/90 hover:bg-fpl-gold text-bg-dark text-sm font-semibold shadow-lg shadow-fpl-gold/30 transition-all hover:scale-105"
+      >
+        <Sparkles className="w-4 h-4" />
+        AI Chat
+      </button>
+
+      {aiOpen && <AiChatPanel teamId={teamIdNum} onClose={() => setAiOpen(false)} />}
     </div>
   );
 }
