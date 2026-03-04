@@ -13,6 +13,7 @@ import { Route as TrendsRouteImport } from './routes/trends'
 import { Route as StatsRouteImport } from './routes/stats'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TeamTeamIdRouteImport } from './routes/team.$teamId'
+import { Route as StrategyTeamIdRouteImport } from './routes/strategy.$teamId'
 
 const TrendsRoute = TrendsRouteImport.update({
   id: '/trends',
@@ -34,17 +35,24 @@ const TeamTeamIdRoute = TeamTeamIdRouteImport.update({
   path: '/team/$teamId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StrategyTeamIdRoute = StrategyTeamIdRouteImport.update({
+  id: '/strategy/$teamId',
+  path: '/strategy/$teamId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/stats': typeof StatsRoute
   '/trends': typeof TrendsRoute
+  '/strategy/$teamId': typeof StrategyTeamIdRoute
   '/team/$teamId': typeof TeamTeamIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/stats': typeof StatsRoute
   '/trends': typeof TrendsRoute
+  '/strategy/$teamId': typeof StrategyTeamIdRoute
   '/team/$teamId': typeof TeamTeamIdRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/stats': typeof StatsRoute
   '/trends': typeof TrendsRoute
+  '/strategy/$teamId': typeof StrategyTeamIdRoute
   '/team/$teamId': typeof TeamTeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/stats' | '/trends' | '/team/$teamId'
+  fullPaths: '/' | '/stats' | '/trends' | '/strategy/$teamId' | '/team/$teamId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/stats' | '/trends' | '/team/$teamId'
-  id: '__root__' | '/' | '/stats' | '/trends' | '/team/$teamId'
+  to: '/' | '/stats' | '/trends' | '/strategy/$teamId' | '/team/$teamId'
+  id:
+    | '__root__'
+    | '/'
+    | '/stats'
+    | '/trends'
+    | '/strategy/$teamId'
+    | '/team/$teamId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   StatsRoute: typeof StatsRoute
   TrendsRoute: typeof TrendsRoute
+  StrategyTeamIdRoute: typeof StrategyTeamIdRoute
   TeamTeamIdRoute: typeof TeamTeamIdRoute
 }
 
@@ -99,6 +115,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamTeamIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/strategy/$teamId': {
+      id: '/strategy/$teamId'
+      path: '/strategy/$teamId'
+      fullPath: '/strategy/$teamId'
+      preLoaderRoute: typeof StrategyTeamIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -106,6 +129,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   StatsRoute: StatsRoute,
   TrendsRoute: TrendsRoute,
+  StrategyTeamIdRoute: StrategyTeamIdRoute,
   TeamTeamIdRoute: TeamTeamIdRoute,
 }
 export const routeTree = rootRouteImport

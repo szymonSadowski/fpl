@@ -68,7 +68,7 @@ export function AiStrategyPanel({ teamId }: Props) {
         )}
 
         {(completion || isLoading) && (
-          <div className="prose prose-invert max-h-96 overflow-y-auto rounded bg-bg-dark/50 p-3 border border-border/30 [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mt-3 [&_h1]:mb-1 [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-3 [&_h2]:mb-1 [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1 [&_p]:text-sm [&_p]:my-1 [&_li]:text-sm [&_li]:my-0.5 [&_ul]:pl-4 [&_ol]:pl-4 [&_strong]:text-white [&_*]:text-text-primary">
+          <div className="prose prose-invert min-h-[500px] overflow-y-auto rounded bg-bg-dark/50 p-4 border border-border/30 [&_h1]:text-xl [&_h1]:font-semibold [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-lg [&_h2]:font-medium [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-medium [&_h3]:mt-3 [&_h3]:mb-1 [&_p]:text-base [&_p]:font-normal [&_p]:leading-relaxed [&_p]:my-2 [&_li]:text-base [&_li]:font-normal [&_li]:leading-relaxed [&_li]:my-1 [&_ul]:pl-5 [&_ol]:pl-5 [&_strong]:font-semibold [&_strong]:text-white [&_*]:text-text-primary">
             <ReactMarkdown>{completion}</ReactMarkdown>
             {isLoading && <span className="animate-pulse text-fpl-gold">▋</span>}
           </div>
