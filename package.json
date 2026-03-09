@@ -1,0 +1,10 @@
+{
+  "name": "fpl-strategy-suite",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "npm install --prefix source/backend && npm install --prefix source/frontend && node scripts/setup-env.js",
+    "dev:backend": "npm run start:dev --prefix source/backend",
+    "dev:frontend": "npm run dev --prefix source/frontend"
+  }
+}
