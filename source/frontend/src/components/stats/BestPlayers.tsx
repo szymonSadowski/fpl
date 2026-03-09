@@ -82,7 +82,7 @@ export function BestPlayers() {
             <button
               key={pos.id}
               onClick={() => setPosFilter(pos.id)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 ${
                 posFilter === pos.id
                   ? 'bg-fpl-grass text-bg-dark glow-grass'
                   : 'bg-bg-dark/60 text-text-muted hover:text-text-primary border border-border/60 hover:border-border'
@@ -100,7 +100,7 @@ export function BestPlayers() {
             <button
               key={opt.key}
               onClick={() => setSortKey(opt.key)}
-              className={`px-2 py-1 rounded text-xs transition-all duration-200 ${
+              className={`px-2 py-1 rounded text-xs transition-colors duration-200 ${
                 sortKey === opt.key
                   ? 'bg-fpl-grass/15 text-fpl-grass'
                   : 'text-text-muted hover:text-text-primary'

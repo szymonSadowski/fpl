@@ -15,7 +15,8 @@ export function GwNavigator({ gw, currentGw, onGwChange }: GwNavigatorProps) {
       <button
         disabled={gw <= 1}
         onClick={() => onGwChange(gw - 1)}
-        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+        aria-label="Previous gameweek"
+        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-fpl-grass/60 focus-visible:outline-none"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
@@ -44,7 +45,8 @@ export function GwNavigator({ gw, currentGw, onGwChange }: GwNavigatorProps) {
       <button
         disabled={gw >= 38}
         onClick={() => onGwChange(gw + 1)}
-        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+        aria-label="Next gameweek"
+        className="p-1.5 rounded-lg border border-border/60 bg-bg-card/60 backdrop-blur-sm hover:bg-bg-card-hover hover:border-fpl-grass/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-fpl-grass/60 focus-visible:outline-none"
       >
         <ChevronRight className="w-4 h-4" />
       </button>

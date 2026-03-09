@@ -225,7 +225,9 @@ function PlayerPhoto({ url, position }: { url: string; position: string }) {
   return (
     <img
       src={url}
-      alt=""
+      alt={`${position} player photo`}
+      width={80}
+      height={96}
       className="w-20 h-24 rounded-lg object-cover bg-bg-dark"
       onError={() => setFailed(true)}
     />
