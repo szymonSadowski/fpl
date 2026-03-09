@@ -138,7 +138,9 @@ export class RecommendationService {
       return this.buildHindsightLineup(players, picks, targetEvent);
     }
 
-    const gw: Fixture[] = fixtures.filter((f) => f.event === targetEvent);
+    const gw: Fixture[] = fixtures.filter(
+      (f) => f.event && f.event >= targetEvent && f.event <= targetEvent + 2,
+    );
     return this.buildPredictionLineup(players, picks, gw);
   }
 
@@ -214,13 +216,32 @@ export class RecommendationService {
       }
     }
 
-    const { starting, bench, captain, viceCaptain } =
+    let { starting, bench, captain, viceCaptain } =
       this.pickOptimalFormation(scored);
+
+    // Force 0% COP starters to last bench slot
+    for (const startingId of [...starting]) {
+      const sp = scored.find((s) => s.element === startingId);
+      if (!sp || sp.player.chance_of_playing_this_round !== 0) continue;
+      const pos = sp.player.element_type;
+      const bestBenchId = bench
+        .map((id) => scored.find((s) => s.element === id))
+        .filter((s): s is ScoredPick => !!s && s.player.element_type === pos)
+        .sort((a, b) => b.score - a.score)[0]?.element;
+      if (bestBenchId !== undefined) {
+        starting = starting.map((id) => (id === startingId ? bestBenchId : id));
+        bench = bench.filter((id) => id !== bestBenchId);
+        bench.push(startingId);
+        if (captain === startingId) captain = bestBenchId;
+        if (viceCaptain === startingId) viceCaptain = bestBenchId;
+      }
+    }
 
     const reasons: Record<number, string> = {};
     for (const s of scored) {
-      reasons[s.element] =
-        `Form: ${s.player.form}, xG: ${s.player.expected_goals}`;
+      const cop = s.player.chance_of_playing_this_round;
+      const copStr = cop != null ? `, COP: ${cop}%` : '';
+      reasons[s.element] = `Form: ${s.player.form}, xG: ${s.player.expected_goals}${copStr}`;
     }
 
     return {
@@ -382,6 +403,7 @@ export class RecommendationService {
     score += parseFloat(player.expected_goals) * 4;
     score += parseFloat(player.expected_assists) * 3;
     score += player.total_points / 10;
+    score += parseFloat(player.ict_index) * 0.05;
 
     const teamFixtures = fixtures.filter(
       (f) => f.team_h === player.team || f.team_a === player.team,
@@ -391,6 +413,14 @@ export class RecommendationService {
         f.team_h === player.team ? f.team_h_difficulty : f.team_a_difficulty;
       score += (5 - difficulty) * 0.5;
     }
+
+    // Penalize part-timers; floor at 0.5 to avoid punishing new signings too hard
+    const minutesWeight = Math.max(Math.min(player.minutes, 2700) / 2700, 0.5);
+    score *= minutesWeight;
+
+    // Scale by chance of playing (null = assume 100%)
+    const cop = (player.chance_of_playing_this_round ?? 100) / 100;
+    score *= cop;
 
     return score;
   }

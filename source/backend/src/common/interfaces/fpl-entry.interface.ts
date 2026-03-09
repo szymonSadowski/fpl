@@ -53,6 +53,7 @@ export type EnrichedPick = {
   purchasePrice: number;
   sellingPrice: number;
   gwPoints?: number;
+  gwMinutes?: number;
   opponent?: { shortName: string; isHome: boolean };
 };
 

@@ -5,7 +5,7 @@
 - Model: `claude-haiku-4-5-20251001` (swap 1 line to change provider)
 - Frontend hooks: `@ai-sdk/react` v3
 
-## Features
+## Features ✅ (all implemented)
 1. **Multi-GW strategy planner** — streaming, `POST /ai/strategy/:teamId?gws=N`
 2. **Captain pick** — JSON, `GET /ai/captain/:teamId`
 3. **Chat panel** — streaming, `POST /ai/chat/:teamId`
@@ -14,13 +14,13 @@
 
 | File | Purpose |
 |---|---|
-| `ai-context.builder.ts` | Parallel-fetches squad/fixtures/recommendations → ~1000-token compact context string, DGW detection |
+| `ai-context.builder.ts` | Parallel-fetches squad/fixtures/recommendations → ~1000-token compact context string, DGW detection (next 6 GWs) |
 | `ai.service.ts` | `streamChat`, `streamStrategy`, `getCaptainPick` via AI SDK |
 | `ai.controller.ts` | NestJS controller for 3 endpoints |
-| `ai.module.ts` | Module wiring |
+| `ai.module.ts` | Module wiring (imports FplClientModule, RecommendationModule) |
 | `dto/chat-message.dto.ts` | Request DTOs |
 
-### Modified
+### Modified files
 - `recommendation/recommendation.module.ts` — added `exports: [RecommendationService]`
 - `app.module.ts` — added `AiModule`
 - `source/backend/.env` — `ANTHROPIC_API_KEY`
@@ -34,14 +34,23 @@
 | File | Purpose |
 |---|---|
 | `hooks/useAiStrategy.ts` | `useCompletion` wrapper, `streamProtocol: 'text'` |
-| `components/ai/AiStrategyPanel.tsx` | Glassmorphic card, GW selector (1/2/3/5), streaming plan |
-| `components/ai/AiChatPanel.tsx` | Slide-in drawer, `TextStreamChatTransport`, suggested prompts |
+| `components/ai/AiStrategyPanel.tsx` | Glassmorphic card, GW selector (1/2/3/5), streaming plan, markdown rendering |
+| `components/ai/AiChatPanel.tsx` | Slide-in drawer, `TextStreamChatTransport`, suggested prompts, smooth scrolling |
 
-### Modified
-- `routes/team.$teamId.tsx` — `AiStrategyPanel` in right col, floating chat button, `AiChatPanel` overlay
+### Routes using AI
+- `routes/team.$teamId.tsx` — floating chat button → `AiChatPanel` overlay
+- `routes/strategy.$teamId.tsx` — 50/50 layout: squad left, `AiStrategyPanel` right + chat button
 
 ### Markdown rendering
 - Both panels use `react-markdown` + `prose prose-invert` for h1/h2/h3/ul/p
+
+## AiContextBuilder details
+Fetches in parallel: squad overview, upcoming fixtures, transfer recommendations, current event.
+Produces compact context with:
+- Current GW, bank, squad value, available/active chips
+- Squad table: name, pos, form, xG, xA, pts, COP, next 5 fixtures
+- Rule-based suggestions (captain, chip, transfers)
+- DGW detection: flags players with 2+ fixtures in next 6 GWs
 
 ## Provider swap
 ```typescript

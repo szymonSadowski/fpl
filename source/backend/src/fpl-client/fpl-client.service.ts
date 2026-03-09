@@ -4,11 +4,30 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { BootstrapStatic, Team, Player, EnrichedPlayer, Event, ElementType } from '../common/interfaces/fpl-bootstrap.interface';
-import { Fixture, EnrichedFixture } from '../common/interfaces/fpl-fixture.interface';
-import { Entry, EntryPicks, EntryHistoryResponse, TeamOverview, EnrichedPick } from '../common/interfaces/fpl-entry.interface';
+import {
+  BootstrapStatic,
+  Team,
+  Player,
+  EnrichedPlayer,
+  Event,
+  ElementType,
+} from '../common/interfaces/fpl-bootstrap.interface';
+import {
+  Fixture,
+  EnrichedFixture,
+} from '../common/interfaces/fpl-fixture.interface';
+import {
+  Entry,
+  EntryPicks,
+  EntryHistoryResponse,
+  TeamOverview,
+  EnrichedPick,
+} from '../common/interfaces/fpl-entry.interface';
 import { LiveResponse } from '../common/interfaces/fpl-live.interface';
-import { ElementSummaryRaw, ElementSummaryResponse } from '../common/interfaces/fpl-element-summary.interface';
+import {
+  ElementSummaryRaw,
+  ElementSummaryResponse,
+} from '../common/interfaces/fpl-element-summary.interface';
 
 const TTL_24H = 86400000;
 const TTL_1H = 3600000;
@@ -34,7 +53,9 @@ export class FplClientService {
     if (cached) return cached;
 
     const { data } = await firstValueFrom(
-      this.httpService.get<BootstrapStatic>(`${this.baseUrl}/bootstrap-static/`),
+      this.httpService.get<BootstrapStatic>(
+        `${this.baseUrl}/bootstrap-static/`,
+      ),
     );
 
     await this.cacheManager.set(cacheKey, data, TTL_5MIN);
@@ -75,9 +96,7 @@ export class FplClientService {
     const url = event
       ? `${this.baseUrl}/fixtures/?event=${event}`
       : `${this.baseUrl}/fixtures/`;
-    const { data } = await firstValueFrom(
-      this.httpService.get<Fixture[]>(url),
-    );
+    const { data } = await firstValueFrom(this.httpService.get<Fixture[]>(url));
     return data;
   }
 
@@ -208,7 +227,9 @@ export class FplClientService {
     if (cached) return cached;
 
     const { data } = await firstValueFrom(
-      this.httpService.get<LiveResponse>(`${this.baseUrl}/event/${event}/live/`),
+      this.httpService.get<LiveResponse>(
+        `${this.baseUrl}/event/${event}/live/`,
+      ),
     );
 
     // Finished events cache 24h, current/future 5min
@@ -219,31 +240,38 @@ export class FplClientService {
     return data;
   }
 
-  async getStandings(): Promise<{
-    rank: number;
-    teamId: number;
-    teamName: string;
-    played: number;
-    win: number;
-    draw: number;
-    loss: number;
-    goalsFor: number;
-    goalsAgainst: number;
-    goalDiff: number;
-    points: number;
-  }[]> {
+  async getStandings(): Promise<
+    {
+      rank: number;
+      teamId: number;
+      teamName: string;
+      played: number;
+      win: number;
+      draw: number;
+      loss: number;
+      goalsFor: number;
+      goalsAgainst: number;
+      goalDiff: number;
+      points: number;
+    }[]
+  > {
     const [fixtures, teams] = await Promise.all([
       this.getFixturesRaw(),
       this.getTeams(),
     ]);
 
     const teamMap = new Map(teams.map((t) => [t.id, t.name]));
-    const stats: Record<number, { w: number; d: number; l: number; gf: number; ga: number }> = {};
+    const stats: Record<
+      number,
+      { w: number; d: number; l: number; gf: number; ga: number }
+    > = {};
 
     teams.forEach((t) => (stats[t.id] = { w: 0, d: 0, l: 0, gf: 0, ga: 0 }));
 
     fixtures
-      .filter((f) => f.finished && f.team_h_score !== null && f.team_a_score !== null)
+      .filter(
+        (f) => f.finished && f.team_h_score !== null && f.team_a_score !== null,
+      )
       .forEach((f) => {
         const hScore = f.team_h_score!;
         const aScore = f.team_a_score!;
@@ -280,7 +308,12 @@ export class FplClientService {
     }));
 
     // Sort: points desc, GD desc, GF desc
-    standings.sort((a, b) => b.points - a.points || b.goalDiff - a.goalDiff || b.goalsFor - a.goalsFor);
+    standings.sort(
+      (a, b) =>
+        b.points - a.points ||
+        b.goalDiff - a.goalDiff ||
+        b.goalsFor - a.goalsFor,
+    );
 
     // Assign rank
     return standings.map((s, i) => ({ rank: i + 1, ...s }));
@@ -288,7 +321,8 @@ export class FplClientService {
 
   async getElementSummary(elementId: number): Promise<ElementSummaryResponse> {
     const cacheKey = `element-summary-${elementId}`;
-    const cached = await this.cacheManager.get<ElementSummaryResponse>(cacheKey);
+    const cached =
+      await this.cacheManager.get<ElementSummaryResponse>(cacheKey);
     if (cached) return cached;
 
     const [{ data: raw }, teams] = await Promise.all([
@@ -334,20 +368,23 @@ export class FplClientService {
   }
 
   async getTeamOverview(teamId: number, event?: number): Promise<TeamOverview> {
-    const [entry, events, history, players, teams, positions] = await Promise.all([
-      this.getEntry(teamId),
-      this.getEvents(),
-      this.getEntryHistory(teamId),
-      this.getPlayersRaw(),
-      this.getTeams(),
-      this.getPositions(),
-    ]);
+    const [entry, events, history, players, teams, positions] =
+      await Promise.all([
+        this.getEntry(teamId),
+        this.getEvents(),
+        this.getEntryHistory(teamId),
+        this.getPlayersRaw(),
+        this.getTeams(),
+        this.getPositions(),
+      ]);
 
     const currentEvent = events.find((e) => e.is_current);
     const currentGw = currentEvent?.id ?? entry.current_event;
     const selectedGw = event ?? currentGw;
     const selectedEvent = events.find((e) => e.id === selectedGw);
-    const isPast = selectedEvent ? selectedEvent.finished : selectedGw < currentGw;
+    const isPast = selectedEvent
+      ? selectedEvent.finished
+      : selectedGw < currentGw;
 
     // For future GWs, picks may not exist yet — fall back to current GW picks
     let picks: EntryPicks;
@@ -365,9 +402,15 @@ export class FplClientService {
 
     // Fetch live data for past/current GWs (where the event has started)
     let liveMap: Map<number, number> | undefined;
+    let minutesMap: Map<number, number> | undefined;
     if (selectedEvent && (selectedEvent.finished || selectedEvent.is_current)) {
       const liveData = await this.getEventLive(selectedGw);
-      liveMap = new Map(liveData.elements.map((el) => [el.id, el.stats.total_points]));
+      liveMap = new Map(
+        liveData.elements.map((el) => [el.id, el.stats.total_points]),
+      );
+      minutesMap = new Map(
+        liveData.elements.map((el) => [el.id, el.stats.minutes]),
+      );
     }
 
     const enrichedPicks: EnrichedPick[] = picks.picks.map((pick) => {
@@ -396,12 +439,17 @@ export class FplClientService {
         isCaptain: pick.is_captain,
         isViceCaptain: pick.is_vice_captain,
         webName: player?.web_name ?? '',
-        team: { id: team?.id ?? 0, name: team?.name ?? '', shortName: team?.short_name ?? '' },
+        team: {
+          id: team?.id ?? 0,
+          name: team?.name ?? '',
+          shortName: team?.short_name ?? '',
+        },
         playerPosition: { id: pos?.id ?? 0, name: pos?.singular_name ?? '' },
         cost: player ? player.now_cost : 0,
         purchasePrice: pick.purchase_price,
         sellingPrice: pick.selling_price,
         gwPoints: liveMap?.get(pick.element),
+        gwMinutes: minutesMap?.get(pick.element),
         opponent,
       };
     });
@@ -414,16 +462,20 @@ export class FplClientService {
     const selectedHalf = selectedGw <= firstHalfEnd ? 1 : 2;
     const chipsUsedInHalf = new Set(
       history.chips
-        .filter((c) => (selectedHalf === 1 ? c.event <= firstHalfEnd : c.event > firstHalfEnd))
+        .filter((c) =>
+          selectedHalf === 1 ? c.event <= firstHalfEnd : c.event > firstHalfEnd,
+        )
         .map((c) => c.name),
     );
     const availableChips = allChips.filter((c) => !chipsUsedInHalf.has(c));
-    const activeChip = history.chips.find((c) => c.event === selectedGw)?.name ?? null;
+    const activeChip =
+      history.chips.find((c) => c.event === selectedGw)?.name ?? null;
 
     // Rank computation — use historical overall_rank for past GWs
     const selectedHist = history.current.find((h) => h.event === selectedGw);
     const prevHist = history.current.find((h) => h.event === selectedGw - 1);
-    const overallRank = selectedHist?.overall_rank ?? entry.summary_overall_rank;
+    const overallRank =
+      selectedHist?.overall_rank ?? entry.summary_overall_rank;
     const gwRank = selectedHist?.rank ?? null;
     const rankDelta =
       prevHist && selectedHist

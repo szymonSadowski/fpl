@@ -1,77 +1,68 @@
-This is a smart move. Providing a clear, technical specification to an AI agent will ensure the code it generates is modular, correctly typed, and adheres to the FPL API's unique quirks.
-
-Here is a comprehensive **`FPL_PROJECT_SPEC.md`** file you can give to any LLM/Agent to kickstart the development.
-
----
-
 # Project Specification: FPL Strategy & Management Suite
 
-## 1. Project Overview
+## 1. Overview
 
-A full-stack application that allows users to manage their Fantasy Premier League (FPL) teams directly, while integrating external betting/statistical data to provide "Optimal Move" suggestions.
+Full-stack app for Fantasy Premier League team management. View squad, browse GW history, get AI strategy advice, captain picks, transfer suggestions, live ranks, price trends, and league standings.
 
 ## 2. Tech Stack
 
-- **Backend Framework:** NestJS (TypeScript)
-- **HTTP Client:** `@nestjs/axios`
-- **Frontend (Planned):** Next.js / React
-- **Data Source 1:** Official FPL Unofficial API (`https://fantasy.premierleague.com/api/`)
-- **Data Source 2:** API-Football or Sportmonks (For odds/advanced predictions)
+| Layer | Tech |
+|---|---|
+| Backend | NestJS (TypeScript), `@nestjs/axios` |
+| Frontend | Vite + React 19, `@tanstack/react-router` |
+| Data | React Query v5 (`@tanstack/react-query`) |
+| Styling | Tailwind CSS v4 (glassmorphic, custom tokens) |
+| AI | Vercel AI SDK v6 + `@ai-sdk/anthropic` (Claude Haiku) |
+| Data source | FPL Unofficial API (`https://fantasy.premierleague.com/api/`) |
 
-## 3. Core Requirements
+## 3. Architecture
 
-### A. Authentication & Session Management
+### Backend modules (`source/backend/src/`)
+| Module | Purpose |
+|---|---|
+| `FplClientModule` | Proxy + cache all FPL API calls |
+| `RecommendationModule` | Transfer, lineup, chip suggestion engine |
+| `StatsModule` | League standings, trends, price changes |
+| `TeamsModule` | Team data, enriched picks |
+| `AiModule` | Claude streaming chat, strategy planner, captain pick |
+| `AuthModule` | Session/cookie management (framework ready) |
 
-- **Login Proxy:** The API must handle authentication with `https://users.premierleague.com/accounts/login/`.
-- **Cookie Handling:** Capture the `pl_profile` cookie. This cookie must be passed in the headers of all "Write" requests.
-- **CSRF:** Handle potential CSRF requirements for state-changing requests (transfers/chips).
+### Frontend routes (`source/frontend/src/routes/`)
+| Route | Component | Description |
+|---|---|---|
+| `/` | Landing | Hero, features, team ID form |
+| `/team/:teamId` | Dashboard | Squad pitch, live rank, chips, lineup rec, AI chat |
+| `/strategy/:teamId` | Strategy | 50/50 squad + AI strategy planner |
+| `/stats` | Stats | League standings, best players |
+| `/trends` | Trends | Price changes, transfer activity |
 
-### B. FPL API Integration (Priority Endpoints)
+## 4. Key Constraints
 
-1. **Bootstrap Static:** `/bootstrap-static/` (Player names, teams, basic stats).
-2. **User Team:** `/my-team/{manager_id}/` (Requires Auth).
-3. **Fixtures:** `/fixtures/` (Schedule and difficulty).
-4. **Transfer Endpoint:** `POST /transfers/` (Requires Auth).
-5. **Chips Endpoint:** `POST /my-team/{manager_id}/chips/` (Requires Auth).
+- FPL API has no CORS — backend proxies all requests
+- `bootstrap-static` cached 5 min, events 1h, other data 24h
+- Strict TypeScript interfaces for all FPL responses (`common/interfaces/`)
+- Handle "Expired Session" errors
 
-### C. Prediction Logic
+## 5. Env Vars
 
-- Integrate an external API to fetch win/loss probabilities and xG (Expected Goals).
-- **Mapping Layer:** A service that maps external Team/Player IDs (e.g., from API-Football) to Official FPL IDs.
+### Backend (`source/backend/.env`)
+| Var | Default | Required |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | — | ✅ for AI features |
+| `FPL_BASE_URL` | `https://fantasy.premierleague.com/api` | ✅ |
+| `FPL_LOGIN_URL` | `https://users.premierleague.com/accounts/login/` | ✅ |
+| `CACHE_TTL_BOOTSTRAP` | `300000` | optional |
+| `PORT` | `3000` | optional |
 
-## 4. Proposed NestJS Architecture
+### Frontend (`source/frontend/.env.local`)
+| Var | Default |
+|---|---|
+| `VITE_API_URL` | `http://localhost:3000` |
 
-### Modules:
+## 6. Implementation Status
 
-1. `AuthModule`: Handles FPL login and session persistence.
-2. `FplClientModule`: A wrapper for all GET/POST requests to the official FPL endpoints.
-3. `StatsModule`: Fetches and cleans data from betting/prediction APIs.
-4. `RecommendationModule`: The engine that compares current user team stats vs. upcoming fixture predictions.
-
-### Key DTOs (Data Transfer Objects):
-
-- `LoginDto`: email, password.
-- `TransferRequestDto`: list of `player_in` IDs, `player_out` IDs, and `chip_to_use`.
-- `ChipRequestDto`: `chip_name` (e.g., 'wildcard', '3xc', 'bboost').
-
-## 5. Known Constraints & Implementation Rules
-
-- **CORS:** FPL API does not support CORS; the NestJS backend must act as a transparent proxy.
-- **Caching:** Implement a 5-minute cache for `/bootstrap-static/` to avoid rate limiting.
-- **Error Handling:** Must handle "Expired Session" errors from FPL and prompt for re-login.
-- **Types:** Use strict TypeScript interfaces for all FPL JSON responses (Players, Teams, Elements).
-
-## 6. Implementation Phases
-
-1. **Phase 1:** Setup NestJS project and `FplClient` to fetch public data.
-2. **Phase 2:** Implement Login proxy and Session (Cookie) management.
-3. **Phase 3:** Build the "Write" services (Transfers/Chips).
-4. **Phase 4:** Integrate external Odds/Prediction APIs and build the "Optimal Suggestion" algorithm.
-
----
-
-### How to use this file:
-
-1. Create a new file named `FPL_PROJECT_SPEC.md` in your project root.
-2. Paste the content above.
-3. When you start your next session with an AI, say: **"Read FPL_PROJECT_SPEC.md. I want to start by implementing Phase 1: The FplClientModule in NestJS."**
+- ✅ Phase 1: FplClientModule — bootstrap, fixtures, public data
+- ✅ Phase 2: Entry data, picks, live GW, element summaries
+- ✅ Phase 3: Recommendation engine (transfers, lineup, chips)
+- ✅ Phase 4: AI features (strategy planner, captain pick, chat panel)
+- ✅ Frontend: Full React UI with glassmorphic design
