@@ -33,7 +33,7 @@ export function TeamIdForm() {
           <div
             className={`
               flex items-center gap-2 rounded-xl border bg-bg-card/80 backdrop-blur-sm
-              transition-all duration-300
+              transition-colors duration-300
               ${focused ? 'border-fpl-grass/60 glow-grass-strong' : 'border-border hover:border-fpl-grass/30'}
             `}
           >
@@ -41,12 +41,14 @@ export function TeamIdForm() {
               type="text"
               inputMode="numeric"
               placeholder="e.g. 123456"
+              name="team-id"
+              autoComplete="off"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value.replace(/\D/g, ''))}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               required
-              className="flex-1 bg-transparent px-5 py-4 text-lg text-text-primary placeholder:text-text-muted focus:outline-none"
+              className="flex-1 bg-transparent px-5 py-4 text-lg text-text-primary placeholder:text-text-muted focus-visible:outline-none"
             />
             <button
               type="submit"

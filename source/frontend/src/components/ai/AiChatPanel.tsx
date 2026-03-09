@@ -53,14 +53,15 @@ export function AiChatPanel({ teamId, onClose }: Props) {
         </div>
         <button
           onClick={onClose}
-          className="text-text-secondary hover:text-text-primary transition-colors"
+          aria-label="Close chat"
+          className="text-text-secondary hover:text-text-primary transition-colors focus-visible:ring-2 focus-visible:ring-fpl-gold/60 focus-visible:outline-none rounded"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3" aria-live="polite" aria-label="Chat messages">
         {messages.length === 0 && (
           <div className="space-y-2">
             <p className="text-xs text-text-secondary">Ask me anything about your squad:</p>
@@ -113,12 +114,15 @@ export function AiChatPanel({ teamId, onClose }: Props) {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask about your squad..."
-          className="flex-1 bg-bg-dark/50 border border-border/50 rounded px-3 py-2 text-xs text-text-primary placeholder-text-secondary focus:outline-none focus:border-fpl-gold/50"
+          name="chat-message"
+          autoComplete="off"
+          className="flex-1 bg-bg-dark/50 border border-border/50 rounded px-3 py-2 text-xs text-text-primary placeholder-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fpl-gold/50 focus-visible:border-fpl-gold/50"
         />
         <button
           type="submit"
           disabled={isLoading || !input.trim()}
-          className="p-2 text-fpl-gold disabled:opacity-40 hover:bg-fpl-gold/10 rounded transition-colors"
+          aria-label="Send message"
+          className="p-2 text-fpl-gold disabled:opacity-40 hover:bg-fpl-gold/10 rounded transition-colors focus-visible:ring-2 focus-visible:ring-fpl-gold/60 focus-visible:outline-none"
         >
           <Send className="w-4 h-4" />
         </button>

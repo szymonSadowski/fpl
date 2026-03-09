@@ -22,6 +22,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
   const displayPoints = mode === 'past' || mode === 'current'
     ? (pick.gwPoints !== undefined ? pick.gwPoints : eventPoints) * (pick.multiplier || 1)
     : 0;
+  const yetToPlay = mode === 'current' && displayPoints === 0 && (pick.gwMinutes ?? 0) === 0;
 
   // Opponent line for past mode
   const opponentLabel = pick.opponent
@@ -40,7 +41,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 p-2 rounded-lg bg-bg-card hover:bg-bg-card-hover transition-colors cursor-pointer" onClick={() => onClick?.(pick.element)}>
+      <button type="button" className="flex items-center gap-3 p-2 rounded-lg bg-bg-card hover:bg-bg-card-hover transition-colors w-full text-left focus-visible:ring-2 focus-visible:ring-fpl-grass/60 focus-visible:outline-none rounded-lg" onClick={() => onClick?.(pick.element)}>
         <div className="w-8 h-8 rounded-full bg-fpl-pitch/50 flex items-center justify-center text-xs font-medium text-fpl-grass">
           {position}
         </div>
@@ -55,7 +56,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
         <div className="text-right">
           {mode !== 'future' && (
             <>
-              <div className="font-medium">{displayPoints}</div>
+              <div className={`font-medium ${yetToPlay ? 'text-text-muted text-[10px]' : ''}`}>{yetToPlay ? 'YTP' : displayPoints}</div>
               {opponentLabel && (
                 <div className="text-[10px] text-text-muted">{opponentLabel}</div>
               )}
@@ -68,12 +69,12 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
           )}
           <div className="text-xs text-text-muted">{formatPrice(pick.cost)}</div>
         </div>
-      </div>
+      </button>
     );
   }
 
   return (
-    <div className="relative group cursor-pointer" onClick={() => onClick?.(pick.element)}>
+    <button type="button" className="relative group cursor-pointer focus-visible:ring-2 focus-visible:ring-fpl-grass/60 focus-visible:outline-none rounded-xl" onClick={() => onClick?.(pick.element)}>
       <div className="w-20 flex flex-col items-center">
         {/* Jersey */}
         <div className="relative w-12 h-12 rounded-full bg-gradient-to-b from-fpl-pitch to-fpl-pitch/70 flex items-center justify-center mb-1 border-2 border-fpl-grass/30 group-hover:border-fpl-grass transition-colors">
@@ -92,7 +93,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
           <div className="text-xs font-medium truncate">{pick.webName}</div>
           {mode !== 'future' ? (
             <>
-              <div className="text-[11px] text-text-muted">{displayPoints} pts</div>
+              <div className="text-[11px] text-text-muted">{yetToPlay ? 'YTP' : `${displayPoints} pts`}</div>
               {opponentLabel && (
                 <div className="text-[10px] text-text-secondary">{opponentLabel}</div>
               )}
@@ -121,7 +122,7 @@ export function PlayerCard({ pick, enrichedPlayer, compact, mode = 'current', ne
           </div>
         )}
       </div>
-    </div>
+    </button>
   );
 }
 
